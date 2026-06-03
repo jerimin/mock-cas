@@ -133,11 +133,8 @@
     $("#app").innerHTML = `
       <div class="hero">
         <h1>Start a <span class="accent">mock exam</span></h1>
-        <p class="lede">Timed practice for GB0-713 — Deploy and Manage the H3C CAS Virtualization Platform (H3CNE-Cloud). Format and policy mirror the real exam.</p>
-        <div class="ctas">
-          <button class="btn btn-primary" id="startNow">Start full mock &rarr;</button>
-        </div>
-        <div class="exam-meta" aria-label="Exam policy">
+        <p class="lede">GB0-713 (H3CNE-Cloud). Policy and format mirror the official syllabus. Pick a mode and go.</p>
+        <div class="exam-meta">
           <div class="item"><span class="label">Questions</span><span class="value">50</span></div>
           <div class="item"><span class="label">Duration</span><span class="value">60 min</span></div>
           <div class="item"><span class="label">Pass mark</span><span class="value">60%</span></div>
@@ -146,30 +143,35 @@
         </div>
       </div>
 
-      <div class="card">
-        <h2>Choose a mode</h2>
-        <p class="muted">Full mock pulls 50 questions weighted across the six modules. Section practice drills one module at a time.</p>
-        <div class="toolbar">
-          <label>
-            Mode
-            <select id="modeSel">
-              <option value="full">Full mock — 50 questions, 60 minutes</option>
-              <option value="section">Section practice — 10 questions, 15 minutes</option>
-            </select>
-          </label>
-          <label id="sectionWrap" class="hidden">
-            Section
-            <select id="sectionSel">${sectionOptions}</select>
-          </label>
-          <button class="btn btn-primary" id="startBtn">Start exam</button>
+      <div class="results-grid">
+        <div class="col">
+          <div class="card">
+            <h2>Choose a mode</h2>
+            <p class="muted">Full mock samples weighted across the six modules. Section practice drills one module.</p>
+            <div class="toolbar">
+              <label>
+                Mode
+                <select id="modeSel">
+                  <option value="full">Full mock — 50 Q / 60 min</option>
+                  <option value="section">Section practice — 10 Q / 15 min</option>
+                </select>
+              </label>
+              <label id="sectionWrap" class="hidden">
+                Section
+                <select id="sectionSel">${sectionOptions}</select>
+              </label>
+              <button class="btn btn-primary" id="startBtn">Start exam</button>
+            </div>
+            <div class="notice">Order shuffled per attempt. Multi-answer = partial credit (correct − wrong picks ÷ total correct, floored at 0). Auto-submits at timer zero.</div>
+          </div>
         </div>
-        <div class="notice">Question order and option order are shuffled every attempt. Multi-answer questions earn partial credit (correct picks minus wrong picks, floored at 0). Auto-submit fires at the timer zero.</div>
-      </div>
-
-      <div class="card">
-        <h2>Full mock weighting</h2>
-        <p class="muted">Each attempt covers every module by syllabus weight. Within-module shuffle minimises repeats.</p>
-        <ul class="section-list">${sectionRows}</ul>
+        <div class="col">
+          <div class="card">
+            <h2>Full mock weighting</h2>
+            <p class="muted">Every attempt covers every module by syllabus weight.</p>
+            <ul class="section-list">${sectionRows}</ul>
+          </div>
+        </div>
       </div>
     `;
     const startFn = () => {
@@ -181,7 +183,6 @@
       $("#sectionWrap").classList.toggle("hidden", e.target.value !== "section");
     });
     $("#startBtn").addEventListener("click", startFn);
-    $("#startNow").addEventListener("click", () => startExam("full", null));
   };
 
   const startExam = (modeKey, sectionFilter) => {
@@ -216,32 +217,34 @@
   const renderRunning = () => {
     if (timerId) { clearInterval(timerId); timerId = null; }
     $("#app").innerHTML = `
-      <div class="exam-topbar">
-        <div class="crumbs">
-          <strong>${escapeHtml(MODES[state.mode].label)}</strong>${state.sectionFilter ? ` — ${escapeHtml(state.sectionFilter)}` : ""} · Q <span id="qpos"></span> / ${state.order.length}
-        </div>
-        <div class="controls">
-          <div class="timer" id="timer">--:--</div>
-          <button class="btn-danger" id="endBtn" title="Submit now and view results">End exam</button>
-          <button class="btn btn-ghost" id="exitBtn" title="Abandon attempt, discard answers">Abandon</button>
-        </div>
-      </div>
-      <div class="exam-shell">
-        <div id="qpane"></div>
-        <aside class="sidebar">
-          <div class="card">
-            <h3>Navigator</h3>
-            <div class="legend">
-              <div><span class="swatch sw-unanswered"></span> Unanswered</div>
-              <div><span class="swatch sw-answered"></span> Answered</div>
-              <div><span class="swatch sw-marked"></span> Marked</div>
-            </div>
-            <div class="qgrid" id="qgrid"></div>
-            <div class="sidebar-actions">
-              <button class="btn btn-primary" id="submitBtn">End exam &amp; see results</button>
-            </div>
+      <div class="exam-runner">
+        <div class="exam-topbar">
+          <div class="crumbs">
+            <strong>${escapeHtml(MODES[state.mode].label)}</strong>${state.sectionFilter ? ` — ${escapeHtml(state.sectionFilter)}` : ""} · Q <span id="qpos"></span> / ${state.order.length}
           </div>
-        </aside>
+          <div class="controls">
+            <div class="timer" id="timer">--:--</div>
+            <button class="btn-danger" id="endBtn" title="Submit now and view results">End exam</button>
+            <button class="btn btn-ghost" id="exitBtn" title="Abandon attempt, discard answers">Abandon</button>
+          </div>
+        </div>
+        <div class="exam-shell">
+          <div id="qpane"></div>
+          <aside class="sidebar">
+            <div class="card">
+              <h3>Navigator</h3>
+              <div class="legend">
+                <div><span class="swatch sw-unanswered"></span> Unanswered</div>
+                <div><span class="swatch sw-answered"></span> Answered</div>
+                <div><span class="swatch sw-marked"></span> Marked</div>
+              </div>
+              <div class="qgrid" id="qgrid"></div>
+              <div class="sidebar-actions">
+                <button class="btn btn-primary" id="submitBtn">End exam &amp; see results</button>
+              </div>
+            </div>
+          </aside>
+        </div>
       </div>
     `;
     renderQuestion();
@@ -304,22 +307,24 @@
           <span class="qsection">${escapeHtml(q.section)}</span>
           <label class="qmark"><input type="checkbox" id="markChk" ${isMarked ? "checked" : ""}> Mark for review</label>
         </div>
-        ${badge ? `<div class="qbadge ${badge.cls}">${escapeHtml(badge.text)}</div>` : ""}
-        <p class="qtext">${escapeHtml(q.question)}</p>
-        <ul class="options" id="optList">
-          ${order.map((origIdx, pos) => {
-            const isSel = selected.includes(pos);
-            return `
-              <li>
-                <label class="option ${isSel ? "selected" : ""}" data-pos="${pos}">
-                  <input type="${multi ? "checkbox" : "radio"}" name="opt" value="${pos}" ${isSel ? "checked" : ""}>
-                  <span class="letter">${letter(pos)}.</span>
-                  <span>${escapeHtml(q.options[origIdx])}</span>
-                </label>
-              </li>
-            `;
-          }).join("")}
-        </ul>
+        <div class="qbody">
+          ${badge ? `<div class="qbadge ${badge.cls}">${escapeHtml(badge.text)}</div>` : ""}
+          <p class="qtext">${escapeHtml(q.question)}</p>
+          <ul class="options" id="optList">
+            ${order.map((origIdx, pos) => {
+              const isSel = selected.includes(pos);
+              return `
+                <li>
+                  <label class="option ${isSel ? "selected" : ""}" data-pos="${pos}">
+                    <input type="${multi ? "checkbox" : "radio"}" name="opt" value="${pos}" ${isSel ? "checked" : ""}>
+                    <span class="letter">${letter(pos)}.</span>
+                    <span>${escapeHtml(q.options[origIdx])}</span>
+                  </label>
+                </li>
+              `;
+            }).join("")}
+          </ul>
+        </div>
         <div class="exam-nav">
           <button id="prevBtn" ${state.currentIdx === 0 ? "disabled" : ""}>&larr; Previous</button>
           <button class="btn btn-primary" id="nextBtn">${state.currentIdx === state.order.length - 1 ? "Review &amp; end" : "Next &rarr;"}</button>
@@ -466,61 +471,66 @@
     const recs = buildRecommendations(perSection);
 
     $("#app").innerHTML = `
-      <div class="card score-card">
-        <div class="scoreline"><span class="score">${scoreRounded}</span><span class="out-of">/${total}</span></div>
-        <div class="pct-line">${pct}% — ${state.autoSubmit ? "auto-submitted at time-up" : "submitted"}, took ${fmtTime(elapsedSec)}</div>
-        <div class="verdict ${passed ? "pass" : "fail"}">${passed ? `Pass · ≥${PASS_PCT}%` : `Below pass mark · ${PASS_PCT}% required`}</div>
-        <div class="tallies">
-          <div class="tally correct"><div class="label">Correct</div><div class="value">${tally.correct}</div></div>
-          <div class="tally partial"><div class="label">Partial</div><div class="value">${tally.partial}</div></div>
-          <div class="tally incorrect"><div class="label">Incorrect</div><div class="value">${tally.incorrect}</div></div>
-          <div class="tally skipped"><div class="label">Skipped</div><div class="value">${tally.skipped}</div></div>
-        </div>
-        <div class="actions">
-          <button class="btn btn-primary" id="newBtn">New attempt</button>
-          <button class="btn" id="exitBtn">Back to start</button>
-        </div>
-      </div>
+      <div class="results-grid">
+        <div class="col">
+          <div class="card score-card">
+            <div class="scoreline"><span class="score">${scoreRounded}</span><span class="out-of">/${total}</span></div>
+            <div class="pct-line">${pct}% — ${state.autoSubmit ? "auto-submitted" : "submitted"} · ${fmtTime(elapsedSec)}</div>
+            <div class="verdict ${passed ? "pass" : "fail"}">${passed ? `Pass · ≥${PASS_PCT}%` : `Below pass · ${PASS_PCT}% required`}</div>
+            <div class="tallies">
+              <div class="tally correct"><div class="label">Correct</div><div class="value">${tally.correct}</div></div>
+              <div class="tally partial"><div class="label">Partial</div><div class="value">${tally.partial}</div></div>
+              <div class="tally incorrect"><div class="label">Wrong</div><div class="value">${tally.incorrect}</div></div>
+              <div class="tally skipped"><div class="label">Skipped</div><div class="value">${tally.skipped}</div></div>
+            </div>
+            <div class="actions">
+              <button class="btn btn-primary" id="newBtn">New attempt</button>
+              <button class="btn" id="exitBtn">Back to start</button>
+            </div>
+          </div>
 
-      <div class="card breakdown">
-        <h2>Section breakdown</h2>
-        <table>
-          <thead><tr><th>Section</th><th class="num">Correct</th><th class="num">Partial</th><th class="num">Wrong</th><th class="num">%</th><th class="bar-cell"></th></tr></thead>
-          <tbody>
-            ${Object.entries(perSection).map(([s, v]) => {
-              const pp = Math.round((v.score / v.total) * 100);
-              const barCls = pp >= 80 ? "strong" : pp < 60 ? "weak" : "";
-              return `<tr>
-                <td>${escapeHtml(s)}</td>
-                <td class="num">${v.correct}</td>
-                <td class="num">${v.partial}</td>
-                <td class="num">${v.incorrect}</td>
-                <td class="num"><strong>${pp}%</strong></td>
-                <td class="bar-cell"><div class="bar ${barCls}"><span style="width:${pp}%"></span></div></td>
-              </tr>`;
-            }).join("")}
-          </tbody>
-        </table>
-      </div>
-
-      <div class="card">
-        <h2>Recommendations</h2>
-        <p class="muted">${recs.length === 0 ? "Strong across every module — review weak distractors to lock it in." : "Focus on these modules before retaking."}</p>
-        <div class="recs">
-          ${recs.length === 0
-            ? `<div class="rec strong"><h4>You're exam-ready</h4><p>Every module above 70%. Run another shuffled mock to verify consistency.</p></div>`
-            : recs.map((r) => `<div class="rec ${r.pct < 50 ? "weak" : "medium"}"><h4>${escapeHtml(r.section)} — ${r.pct}%</h4><p>${escapeHtml(r.advice)}</p></div>`).join("")}
+          <div class="card" id="emailCard">
+            <h2>Email me the detailed report</h2>
+            <p class="muted">Full question-by-question review with explanations, sent to your inbox. Not stored.</p>
+            <form class="email-form" id="emailForm">
+              <input type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
+              <button class="btn btn-primary" type="submit">Send</button>
+            </form>
+            <div class="email-status" id="emailStatus"></div>
+          </div>
         </div>
-      </div>
 
-      <div class="card" id="emailCard">
-        <h2>Email me the detailed report</h2>
-        <p class="muted">Question-by-question breakdown with explanations, sent to your inbox. Not stored anywhere.</p>
-        <form class="email-form" id="emailForm">
-          <input type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
-          <button class="btn btn-primary" type="submit">Send detailed report</button>
-        </form>
-        <div class="email-status" id="emailStatus"></div>
+        <div class="col">
+          <div class="card breakdown">
+            <h2>Section breakdown</h2>
+            <table>
+              <thead><tr><th>Section</th><th class="num">✓</th><th class="num">½</th><th class="num">✗</th><th class="num">%</th><th class="bar-cell"></th></tr></thead>
+              <tbody>
+                ${Object.entries(perSection).map(([s, v]) => {
+                  const pp = Math.round((v.score / v.total) * 100);
+                  const barCls = pp >= 80 ? "strong" : pp < 60 ? "weak" : "";
+                  return `<tr>
+                    <td>${escapeHtml(s)}</td>
+                    <td class="num">${v.correct}</td>
+                    <td class="num">${v.partial}</td>
+                    <td class="num">${v.incorrect}</td>
+                    <td class="num"><strong>${pp}%</strong></td>
+                    <td class="bar-cell"><div class="bar ${barCls}"><span style="width:${pp}%"></span></div></td>
+                  </tr>`;
+                }).join("")}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card">
+            <h2>Recommendations</h2>
+            <div class="recs">
+              ${recs.length === 0
+                ? `<div class="rec strong"><h4>You're exam-ready</h4><p>Every module above 70%. Re-run a shuffled mock to verify consistency.</p></div>`
+                : recs.map((r) => `<div class="rec ${r.pct < 50 ? "weak" : "medium"}"><h4>${escapeHtml(r.section)} — ${r.pct}%</h4><p>${escapeHtml(r.advice)}</p></div>`).join("")}
+            </div>
+          </div>
+        </div>
       </div>
     `;
 
