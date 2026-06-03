@@ -1,0 +1,782 @@
+[
+  {
+    "id": "intro-01",
+    "section": "Virtualization Introduction",
+    "question": "Which of the following best describes the data-center evolution trend presented in the course?",
+    "options": [
+      "Bare Metal -> Container -> Virtualization",
+      "Bare Metal -> Virtualization -> Container",
+      "Virtualization -> Bare Metal -> Container",
+      "Container -> Virtualization -> Bare Metal"
+    ],
+    "correctIndex": 1,
+    "explanation": "The course outlines the evolution from Bare Metal (uneven resource utilization, hard to upgrade) to Virtualization (higher utilization and availability) to Container (higher performance, faster boot)."
+  },
+  {
+    "id": "intro-02",
+    "section": "Virtualization Introduction",
+    "question": "What is the primary purpose of server virtualization as described in the course?",
+    "options": [
+      "Convert logical servers into multiple dedicated physical hosts",
+      "Run a single OS instance directly on bare metal for maximum speed",
+      "Turn physical servers into logical resources hosting multiple isolated VMs to improve utilization",
+      "Replace the hypervisor with a container engine to reduce overhead"
+    ],
+    "correctIndex": 2,
+    "explanation": "Server virtualization makes physical servers into logical resources with several isolated VMs running on them, improving resource utilization, simplifying management, and enabling server consolidation."
+  },
+  {
+    "id": "intro-03",
+    "section": "Virtualization Introduction",
+    "question": "In H3C network virtualization terminology, which statement about IRF and MDC is correct?",
+    "options": [
+      "IRF is 1:N, MDC is N:1",
+      "IRF is N:1, MDC is 1:N",
+      "Both IRF and MDC are N:1 technologies",
+      "Both IRF and MDC are 1:N technologies"
+    ],
+    "correctIndex": 1,
+    "explanation": "IRF is an N:1 technology that virtualizes multiple physical network devices into one, while MDC is a 1:N technology that virtualizes one device into multiple logical devices."
+  },
+  {
+    "id": "intro-04",
+    "section": "Virtualization Introduction",
+    "question": "Which of the following is NOT one of the storage virtualization implementation types listed in the course?",
+    "options": [
+      "Storage virtualization based on host",
+      "Storage virtualization based on storage device",
+      "Storage virtualization based on network device",
+      "Storage virtualization based on hypervisor kernel"
+    ],
+    "correctIndex": 3,
+    "explanation": "The course lists three storage virtualization types: based on host, based on storage device, and based on network device. Hypervisor-kernel-based storage virtualization is not listed."
+  },
+  {
+    "id": "intro-05",
+    "section": "Virtualization Introduction",
+    "question": "Which set correctly lists the five features of cloud computing referenced in the course?",
+    "options": [
+      "Self-service, Resource pooling, Flexible scheduling, Network distribution, Service measurable",
+      "Self-service, Multi-tenancy, Bare metal, Network distribution, Pay-per-use",
+      "Containers, Serverless, Virtualization, Automation, Open source",
+      "IaaS, PaaS, SaaS, Public cloud, Private cloud"
+    ],
+    "correctIndex": 0,
+    "explanation": "The course names the five features as Self-service, Resource pooling, Flexible scheduling, Network distribution, and Service measurable."
+  },
+  {
+    "id": "intro-06",
+    "section": "Virtualization Introduction",
+    "question": "In the IaaS/PaaS/SaaS layering shown, which service mode delivers the operating system and database as part of the platform but leaves applications to the customer?",
+    "options": [
+      "IaaS",
+      "PaaS",
+      "SaaS",
+      "Bare metal"
+    ],
+    "correctIndex": 1,
+    "explanation": "PaaS provides computing, storage, network, OS, database, middleware and runtime, while the customer supplies the application and data. SaaS goes further by also providing the application."
+  },
+  {
+    "id": "intro-07",
+    "section": "Virtualization Introduction",
+    "question": "Which of the following correctly maps a cloud deployment model to its description from the course?",
+    "options": [
+      "Public cloud: system for internal office use by enterprise users",
+      "Private cloud: cloud service provider owns and manages on-demand standardized products",
+      "Hybrid cloud: combines self-use and leased resources",
+      "Industry cloud: a synonym for public cloud sold to consumers"
+    ],
+    "correctIndex": 2,
+    "explanation": "The course describes hybrid cloud as a mix of self-use and leased resources, public cloud as the provider-owned on-demand model, and private cloud as the enterprise internal-use system."
+  },
+  {
+    "id": "intro-08",
+    "section": "Virtualization Introduction",
+    "question": "What is the role of vMotion in the CAS virtualization platform?",
+    "options": [
+      "A backup engine that replaces native VM snapshots",
+      "The core foundation of HA, DRS and DPM that migrates VMs flexibly between hosts",
+      "A licensing module that enforces per-CPU activation",
+      "A GPU passthrough scheduler for high-performance computing"
+    ],
+    "correctIndex": 1,
+    "explanation": "The course states vMotion is the core foundation of HA, DRS, and DPM, allowing VMs to move flexibly between physical hosts and even data centers, improving scheduling flexibility and reducing planned downtime."
+  },
+  {
+    "id": "intro-09",
+    "section": "Virtualization Introduction",
+    "question": "Which statement about the CAS native backup function is correct according to the course?",
+    "options": [
+      "It supports deduplication, compression and encryption out of the box",
+      "It supports VM, database and file backup with high backup rate",
+      "There is no additional cost to use it, but it only supports VM backup and is mainly for small scenarios",
+      "It requires third-party software such as AnyBackup or DataVault to function"
+    ],
+    "correctIndex": 2,
+    "explanation": "The course says CAS native backup has no additional cost, but is limited: low backup rate suited to small scenarios, only VM backup (no database or file), and no deduplication, compression or encryption."
+  },
+  {
+    "id": "intro-10",
+    "section": "Virtualization Introduction",
+    "question": "Within the H3C cloud computing overall solution, which product is described as providing computing virtualization?",
+    "options": [
+      "ONEStor",
+      "SDN",
+      "CAS",
+      "UIS"
+    ],
+    "correctIndex": 2,
+    "explanation": "In the H3C overall solution diagram, CAS is the computing virtualization product, SDN provides network virtualization, ONEStor provides storage virtualization, and UIS is the unified infrastructure system."
+  },
+  {
+    "id": "infra-01",
+    "section": "Virtualized Infrastructure",
+    "question": "Which formula correctly expresses the main frequency (clock frequency) of a CPU?",
+    "options": [
+      "Main Frequency = External Frequency + Frequency Multiplication Factor",
+      "Main Frequency = External Frequency x Frequency Multiplication Factor",
+      "Main Frequency = Cache Size x Frequency Multiplication Factor",
+      "Main Frequency = External Frequency / Frequency Multiplication Factor"
+    ],
+    "correctIndex": 1,
+    "explanation": "The course defines CPU main frequency (clock frequency, in MHz) as External Frequency multiplied by the Frequency Multiplication Factor."
+  },
+  {
+    "id": "infra-02",
+    "section": "Virtualized Infrastructure",
+    "question": "What is the purpose of the cache battery on a server RAID card?",
+    "options": [
+      "To power the RAID card if the main server PSU is replaced",
+      "To allow the RAID card to operate without a host CPU",
+      "To protect data held in the RAID card cache when the server is powered off",
+      "To increase the maximum sustained write throughput of the cache"
+    ],
+    "correctIndex": 2,
+    "explanation": "The cache battery (BBWC or FBWC) is used to ensure security of data in the RAID card cache when the server is powered off so cached writes are not lost."
+  },
+  {
+    "id": "infra-03",
+    "section": "Virtualized Infrastructure",
+    "question": "Which statement best describes the role of VLANs in a cloud network built on H3C CAS CVK hosts?",
+    "options": [
+      "VLANs increase the bandwidth available between two physical switches",
+      "VLANs isolate broadcast domains so different services on the host pool can be separated",
+      "VLANs encrypt traffic between virtual machines on different hosts",
+      "VLANs replace the need for link aggregation between switches"
+    ],
+    "correctIndex": 1,
+    "explanation": "The course shows VLANs being used to isolate broadcast storms and to separate different services across the H3C CAS CVK host pool."
+  },
+  {
+    "id": "infra-04",
+    "section": "Virtualized Infrastructure",
+    "question": "What is the key difference between static and dynamic link aggregation modes?",
+    "options": [
+      "Static aggregation supports Layer 3 ports while dynamic only supports Layer 2 ports",
+      "Static aggregation provides redundancy while dynamic aggregation only increases bandwidth",
+      "In static mode the port does not exchange information with the peer, while dynamic mode uses LACP to exchange information with the peer device",
+      "Static aggregation requires a switch reboot while dynamic aggregation does not"
+    ],
+    "correctIndex": 2,
+    "explanation": "In static aggregation the port does not exchange information with the peer; dynamic aggregation automatically enables LACP to exchange packets with the peer device."
+  },
+  {
+    "id": "infra-05",
+    "section": "Virtualized Infrastructure",
+    "question": "Which UDP ports does DHCP use for the server and the client respectively?",
+    "options": [
+      "Server 67, client 68",
+      "Server 68, client 67",
+      "Server 53, client 67",
+      "Server 80, client 8080"
+    ],
+    "correctIndex": 0,
+    "explanation": "The course states DHCP packets are encapsulated using UDP, with the server intercepting on port 67 and the client on port 68."
+  },
+  {
+    "id": "infra-06",
+    "section": "Virtualized Infrastructure",
+    "question": "Which statement about QoS in the H3C CAS environment is correct?",
+    "options": [
+      "QoS can create additional bandwidth on a congested link",
+      "QoS guarantees zero packet loss in all conditions",
+      "QoS cannot create bandwidth but can allocate available bandwidth more reasonably",
+      "QoS replaces ACLs for packet filtering"
+    ],
+    "correctIndex": 2,
+    "explanation": "The QoS functions slide explicitly states QoS cannot create bandwidth but can only allocate bandwidth more reasonably."
+  },
+  {
+    "id": "infra-07",
+    "section": "Virtualized Infrastructure",
+    "question": "Which best describes the SAN (Storage Area Network) architecture compared to DAS and NAS?",
+    "options": [
+      "SAN connects storage directly to a single server using SCSI cables, taking the server as the center",
+      "SAN provides only file-level access using CIFS or NFS over the existing LAN",
+      "SAN connects storage, servers, and clients through a dedicated network and accesses data in block mode using FCP or iSCSI",
+      "SAN can only be implemented over Fibre Channel and does not support IP networks"
+    ],
+    "correctIndex": 2,
+    "explanation": "SAN is an architecture in which storage, servers, and clients are connected via a network, accessing data in block mode using FCP (FC SAN) or iSCSI (IP SAN)."
+  },
+  {
+    "id": "infra-08",
+    "section": "Virtualized Infrastructure",
+    "question": "Which RAID level provides distributed parity and requires a minimum of 3 disks, with a usable capacity of (n-1) x c?",
+    "options": [
+      "RAID 0",
+      "RAID 1",
+      "RAID 5",
+      "RAID 10"
+    ],
+    "correctIndex": 2,
+    "explanation": "RAID 5 stores data with distributed parity, requires a minimum of 3 disks, and has an effective capacity of (n-1) x c per the comparison table."
+  },
+  {
+    "id": "infra-09",
+    "section": "Virtualized Infrastructure",
+    "question": "What is the main function of storage multi-path technology?",
+    "options": [
+      "It compresses data so the same LUN consumes less storage capacity",
+      "It provides multiple physical connections between the initiator and the target to improve reliability, balance load, and increase bandwidth",
+      "It allows a single HBA to address more than 16 SCSI bus IDs",
+      "It replaces RAID for protecting against disk failures"
+    ],
+    "correctIndex": 1,
+    "explanation": "Multi-path means the initiator has more than one physical connection to the target, with functions of improving reliability, balancing load, and increasing bandwidth."
+  },
+  {
+    "id": "infra-10",
+    "section": "Virtualized Infrastructure",
+    "question": "Which statement about thin provisioning (thin volumes) is correct?",
+    "options": [
+      "A thin volume can expand beyond the capacity specified when the volume was created",
+      "Thin volumes always perform faster than thick volumes for critical services",
+      "When a thin volume is mirrored or replicated between storages, only data actually used needs to be synchronized, saving CPU, disk, and bandwidth",
+      "Thin provisioning eliminates the need to monitor the storage pool's free capacity"
+    ],
+    "correctIndex": 2,
+    "explanation": "Because only the actually used data of a thin volume is synchronized during mirroring, cloning, and remote replication, CPU, disk, and bandwidth overhead are reduced."
+  },
+  {
+    "id": "deploy-01",
+    "section": "Deploying Virtualization Platform",
+    "question": "What are the three main steps in the H3C CAS virtualization platform deployment process?",
+    "options": [
+      "License registration, OS installation, and VM template creation",
+      "Initial deployment planning, cluster installation deployment, and VM configuration deployment",
+      "Hardware procurement, network cabling, and software installation",
+      "Server preparation, hot standby configuration, and DRS configuration"
+    ],
+    "correctIndex": 1,
+    "explanation": "The introduction states the CAS platform has three main deployment steps: 1) Initial deployment planning, 2) Cluster installation deployment, and 3) VM configuration deployment."
+  },
+  {
+    "id": "deploy-02",
+    "section": "Deploying Virtualization Platform",
+    "question": "Which hardware virtualization technology is required for H3C CAS to run on x86 servers?",
+    "options": [
+      "Intel-VT or AMD-V",
+      "ARM VHE virtualization extension",
+      "Hyper-V or KVM",
+      "Paravirtualization only"
+    ],
+    "correctIndex": 0,
+    "explanation": "H3C CAS is a hardware-assisted virtualization system that requires Intel-VT or AMD-V on x86 servers; ARM-based servers require the ARM VHE virtualization extension."
+  },
+  {
+    "id": "deploy-03",
+    "section": "Deploying Virtualization Platform",
+    "question": "Why may the management server have lower hardware requirements than the service server?",
+    "options": [
+      "Because the management server only runs a web browser",
+      "Because it does not need to support RAID configuration",
+      "Because if it does not join the host pool and runs no VMs, CPU virtualization support is not required",
+      "Because the management server always runs as a VM"
+    ],
+    "correctIndex": 2,
+    "explanation": "Per the management server section, if the management server does not join the host pool and no VM is created or run on it, the CPU is not required to support virtualization, so requirements are much lower."
+  },
+  {
+    "id": "deploy-04",
+    "section": "Deploying Virtualization Platform",
+    "question": "In an IP SAN networking plan, what is the recommended physical-interface arrangement for the management, service, and storage networks?",
+    "options": [
+      "A single 1 GB network interface card shared across all three networks",
+      "Two network interface cards in link aggregation for each network",
+      "One dedicated FC HBA card per network",
+      "Three NICs per network, configured as active/active/active"
+    ],
+    "correctIndex": 1,
+    "explanation": "The IP SAN networking plan specifies that the management, service, and storage networks each use two network interface cards in link aggregation."
+  },
+  {
+    "id": "deploy-05",
+    "section": "Deploying Virtualization Platform",
+    "question": "Which storage RAID guidance does the CAS storage plan give for a server with more than two local disks?",
+    "options": [
+      "RAID 0 for maximum capacity",
+      "RAID 1 mirroring",
+      "RAID 5 configuration",
+      "JBOD with no RAID"
+    ],
+    "correctIndex": 2,
+    "explanation": "The Storage plan states that if the server uses more than two local disks, RAID 5 is advised; two local disks should use RAID 1."
+  },
+  {
+    "id": "deploy-06",
+    "section": "Deploying Virtualization Platform",
+    "question": "When a host pool contains only two CVK hosts, what is required for the storage pool's locking mechanism?",
+    "options": [
+      "Distributed locking, supported on any storage",
+      "No locking is required with only two hosts",
+      "Hardware-assisted locking, which requires storage that supports the CAW feature",
+      "File-based locking via NFS only"
+    ],
+    "correctIndex": 2,
+    "explanation": "The storage plan notes that in a two-CVK-host host pool, hardware-assisted locking is required, and this requires the storage server to support the CAW feature."
+  },
+  {
+    "id": "deploy-07",
+    "section": "Deploying Virtualization Platform",
+    "question": "Which best describes the advanced arbitration mechanism for CAS hot standby?",
+    "options": [
+      "It pings two configured quorum IP addresses to determine network failure",
+      "A designated CVK quorum host receives state info from both management nodes and decides each node's role",
+      "It forces both nodes to reboot when communication is lost",
+      "It only works between two management nodes deployed as VMs"
+    ],
+    "correctIndex": 1,
+    "explanation": "Advanced arbitration designates a CVK host as the quorum host; when the primary and backup management nodes cannot communicate, they send state info to the quorum host, which determines and assigns roles."
+  },
+  {
+    "id": "deploy-08",
+    "section": "Deploying Virtualization Platform",
+    "question": "According to CAS planning, what is the recommended maximum number of HA clusters per host pool and maximum CVK hosts per HA cluster?",
+    "options": [
+      "Less than four HA clusters per host pool; less than 32 CVK hosts per HA cluster",
+      "Up to ten HA clusters per host pool; up to 64 CVK hosts per HA cluster",
+      "Two HA clusters per host pool; sixteen CVK hosts per HA cluster",
+      "One HA cluster per host pool; unlimited CVK hosts"
+    ],
+    "correctIndex": 0,
+    "explanation": "Host pool/cluster planning recommends fewer than four HA clusters per host pool and fewer than 32 CVK hosts per HA cluster."
+  },
+  {
+    "id": "deploy-09",
+    "section": "Deploying Virtualization Platform",
+    "question": "What is the purpose of installing CAStools inside a VM on the H3C CAS platform?",
+    "options": [
+      "To provide a license for the guest operating system",
+      "To enable the CAS platform to obtain accurate monitoring data such as CPU and memory utilization from the VM",
+      "To bypass the need for hardware virtualization",
+      "To convert the VM into a template automatically"
+    ],
+    "correctIndex": 1,
+    "explanation": "Without CAStools, the CAS platform and VM are independent and CAS cannot read CPU/memory utilization; installing CAStools enables accurate VM monitoring data."
+  },
+  {
+    "id": "deploy-10",
+    "section": "Deploying Virtualization Platform",
+    "question": "Which statement correctly describes the difference between 'Cloned as Template' and 'Convert to Template'?",
+    "options": [
+      "Cloned as Template deletes the original VM; Convert to Template keeps it",
+      "Cloned as Template retains the original VM; Convert to Template replaces the VM with the template",
+      "Both operations always retain the original VM",
+      "Convert to Template requires the VM to be running; Cloned as Template requires it to be off"
+    ],
+    "correctIndex": 1,
+    "explanation": "Per the VM template section: Cloned as Template keeps the original VM after the operation, while Convert to Template replaces the original VM with the template (it is not retained)."
+  },
+  {
+    "id": "basic-01",
+    "section": "Basic Functions",
+    "question": "Which of the following best describes the relationship between cloud resource components in H3C CAS?",
+    "options": [
+      "A VM contains a host, which contains a cluster, which contains a host pool",
+      "A host pool is a collection of hosts and clusters; a cluster groups physical hosts and VMs",
+      "A cluster contains host pools, which contain individual hosts",
+      "Host pools and clusters are independent and cannot be combined"
+    ],
+    "correctIndex": 1,
+    "explanation": "A host pool is a collection of a series of hosts and clusters, while a cluster is a computing resource collection composed of physical hosts and VMs."
+  },
+  {
+    "id": "basic-02",
+    "section": "Basic Functions",
+    "question": "Which CPU working mode is recommended in H3C CAS and uses the QEMU64 type for high compatibility?",
+    "options": [
+      "Straight-through mode",
+      "Host matching mode",
+      "Compatibility mode",
+      "Pass-through mode"
+    ],
+    "correctIndex": 2,
+    "explanation": "Compatibility mode (recommended) uses the QEMU emulated CPU of type QEMU64, providing high compatibility but not optimal performance."
+  },
+  {
+    "id": "basic-03",
+    "section": "Basic Functions",
+    "question": "What is the purpose of the balloon driver in virtual memory management?",
+    "options": [
+      "Slice memory into 4 KB units and deduplicate identical pages",
+      "Swap unused memory to disk and map it back when accessed",
+      "Reclaim free memory from one VM and reallocate it to another VM on the same host",
+      "Encrypt memory pages between VMs on the same host"
+    ],
+    "correctIndex": 2,
+    "explanation": "The balloon driver installed via CAStools reclaims free memory inside a VM and releases it to another VM that needs more memory on the same host."
+  },
+  {
+    "id": "basic-04",
+    "section": "Basic Functions",
+    "question": "Which virtual disk cache mode is recommended to avoid the risk of data loss?",
+    "options": [
+      "Direct read and write (directsync)",
+      "Level 1 virtual cache (none)",
+      "Level 2 virtual cache (writeback)",
+      "Level 1 physical cache (writethrough)"
+    ],
+    "correctIndex": 0,
+    "explanation": "Level 1 physical, Level 1 virtual, and Level 2 virtual caches all carry data loss risk; direct read and write (directsync) is recommended."
+  },
+  {
+    "id": "basic-05",
+    "section": "Basic Functions",
+    "question": "Which statement about the three-level mirror structure of a VM is correct?",
+    "options": [
+      "All three levels are read-write and unique per VM",
+      "VMs share a read-only Level 1 image file and have their own read-write Level 2 and Level 3 image files",
+      "Data written to the VM is stored to the Level 1 image file",
+      "Only Level 3 image files are shared, while Levels 1 and 2 are private"
+    ],
+    "correctIndex": 1,
+    "explanation": "VMs share a read-only Level 1 image, but each VM has its own read-write Level 2 and Level 3 image files; new data is written only to Level 3."
+  },
+  {
+    "id": "basic-06",
+    "section": "Basic Functions",
+    "question": "Which characteristic of a cloned VM in H3C CAS must be considered when bringing both VMs online?",
+    "options": [
+      "The cloned VM has a new IP address by default",
+      "The cloned VM keeps the same vNIC MAC and UUID as the original",
+      "The cloned VM and the original have the same IP address, so an IP conflict must be avoided",
+      "The original VM is deleted after cloning"
+    ],
+    "correctIndex": 2,
+    "explanation": "A cloned VM has the same IP address as the original; a new vNIC MAC and UUID are generated, but IP conflicts must be addressed manually."
+  },
+  {
+    "id": "basic-07",
+    "section": "Basic Functions",
+    "question": "What is a key prerequisite for offline VM migration in H3C CAS?",
+    "options": [
+      "The VM must be running",
+      "The image file must be stored in shared storage",
+      "The source and destination hosts must be in different clusters",
+      "Memory data must first be copied via the management network"
+    ],
+    "correctIndex": 1,
+    "explanation": "For both offline and online host migration in CAS, the VM image file must be stored on shared storage."
+  },
+  {
+    "id": "basic-08",
+    "section": "Basic Functions",
+    "question": "Which statement best describes a differential backup compared to an incremental backup?",
+    "options": [
+      "Differential backup copies all data each time; incremental only copies changes since the last full backup",
+      "Differential backup copies data changed since the last full backup; incremental copies data changed since the last backup of any type",
+      "Differential and incremental backups are identical in behavior",
+      "Differential backup requires every previous incremental backup to restore"
+    ],
+    "correctIndex": 1,
+    "explanation": "Differential backup copies data changed since the last full backup, while incremental backup only copies data changed since the last (any) backup."
+  },
+  {
+    "id": "basic-09",
+    "section": "Basic Functions",
+    "question": "What happens when both a vFirewall and an ACL are configured on the same VM?",
+    "options": [
+      "Both rules are evaluated together in the order configured",
+      "The ACL takes effect and the vFirewall is ignored",
+      "The vFirewall takes effect because vFirewalls and ACLs are mutually exclusive",
+      "The VM is blocked from all network access until one is removed"
+    ],
+    "correctIndex": 2,
+    "explanation": "vFirewalls and ACLs are mutually exclusive; if both are configured on a VM, the vFirewall takes effect."
+  },
+  {
+    "id": "basic-10",
+    "section": "Basic Functions",
+    "question": "Which encryption algorithm and limitation applies to H3C CAS kernel-level VM disk encryption?",
+    "options": [
+      "AES-128 in CBC mode; supports both RAW and QCOW2 disk formats",
+      "XTS-AES-256 symmetric algorithm; does not support QCOW2 disk file format",
+      "RSA-2048 asymmetric encryption; works only on Linux VMs",
+      "3DES symmetric algorithm; requires file-level encryption in the guest OS"
+    ],
+    "correctIndex": 1,
+    "explanation": "CAS uses the XTS-AES-256 symmetric algorithm at the kernel layer, encrypts at RAW disk block granularity, and does not support VMs in QCOW2 disk format."
+  },
+  {
+    "id": "advanced-01",
+    "section": "Advanced Functions",
+    "question": "Which three entities make up the CVM hot standby system?",
+    "options": [
+      "Active node, standby node, and witness node",
+      "Active node, standby node, and arbitration node",
+      "Primary CVM, secondary CVM, and load balancer",
+      "Master, slave, and shared storage node"
+    ],
+    "correctIndex": 1,
+    "explanation": "The hot standby system consists of three entities: an active node, a standby node, and an arbitration node. Data is synchronized between active and standby via DRBD storage replication."
+  },
+  {
+    "id": "advanced-02",
+    "section": "Advanced Functions",
+    "question": "Which best describes the HA failure detection mechanism in H3C CAS?",
+    "options": [
+      "It checks whether the CVK host can normally access the shared storage pool connected to the CVK host",
+      "It pings the management IP of each CVK host every second",
+      "It monitors CPU utilization thresholds set by the administrator",
+      "It uses SNMP traps from physical servers to detect outages"
+    ],
+    "correctIndex": 0,
+    "explanation": "The HA failure detection mechanism is based on whether the CVK host can normally access the shared storage pool connected to the host, combined with a network heartbeat check on the management network."
+  },
+  {
+    "id": "advanced-03",
+    "section": "Advanced Functions",
+    "question": "What is the purpose of the 'Minimum number of effective nodes' setting in HA access control?",
+    "options": [
+      "It defines how many hosts are required to form a quorum before the cluster boots",
+      "It sets the minimum number of replicas required per VM disk",
+      "If the number of normally running hosts is less than this value, HA fault migration cannot be performed",
+      "It limits how many VMs may run on a single host concurrently"
+    ],
+    "correctIndex": 2,
+    "explanation": "If the number of hosts normally running in the cluster is less than the configured minimum, the VM cannot perform HA fault migration, preventing overload on the remaining hosts."
+  },
+  {
+    "id": "advanced-04",
+    "section": "Advanced Functions",
+    "question": "Which statement about Fault Tolerance (FT) in H3C CAS is correct?",
+    "options": [
+      "FT periodically snapshots the VM to a backup datastore for crash recovery",
+      "FT keeps a primary and standby VM in lockstep with memory check and storage dual-write, providing zero downtime",
+      "FT migrates a VM only after the primary host has failed for 30 seconds",
+      "FT replaces HA when shared storage is unavailable"
+    ],
+    "correctIndex": 1,
+    "explanation": "FT (Fault Tolerance) keeps a primary and standby VM synchronized via memory check/synchronization and storage dual-write, achieving continuous availability with no business downtime and no storage loss."
+  },
+  {
+    "id": "advanced-05",
+    "section": "Advanced Functions",
+    "question": "Which monitoring metrics does computing and network DRS use to balance load across hosts?",
+    "options": [
+      "Disk I/O throughput, IOPS, and disk utilization",
+      "Host memory, CPU, and network traffic",
+      "Power draw, temperature, and fan speed",
+      "VM count, snapshot count, and uptime"
+    ],
+    "correctIndex": 1,
+    "explanation": "Computing and network DRS monitors host memory, CPU, and network traffic to decide when to migrate VMs. Storage DRS instead monitors disk I/O throughput, IOPS, or disk utilization."
+  },
+  {
+    "id": "advanced-06",
+    "section": "Advanced Functions",
+    "question": "Which prerequisite must be satisfied to use the Dynamic Power Management (DPM) policy?",
+    "options": [
+      "All VMs must have CASTools installed and SR-IOV enabled",
+      "Hosts must use local storage only so that recycled servers can be safely shut down",
+      "All hosts and VMs in the cluster must use the same shared storage, VMs must enable Auto Migration, and hosts must enable Wakeup",
+      "The cluster must have an odd number of hosts with at least one configured as a failover host"
+    ],
+    "correctIndex": 2,
+    "explanation": "DPM requires all hosts and VMs in the cluster to use the same shared storage, VMs to enable Auto Migration, and hosts to enable the Wakeup function so idle servers can be shut down and woken on demand."
+  },
+  {
+    "id": "advanced-07",
+    "section": "Advanced Functions",
+    "question": "What is the main advantage of SR-IOV networking for VMs?",
+    "options": [
+      "It deduplicates network packets across VMs to save bandwidth",
+      "It enforces strict QoS by routing all traffic through the hypervisor first",
+      "Each VM occupies a VF interface and directly accesses it without hypervisor intervention, greatly improving network throughput",
+      "It encrypts all VM-to-VM traffic at the NIC level"
+    ],
+    "correctIndex": 2,
+    "explanation": "SR-IOV virtualizes a single physical NIC into multiple VF interfaces. Each VM accesses its own VF directly without coordinated intervention from the hypervisor, greatly improving network throughput performance."
+  },
+  {
+    "id": "advanced-08",
+    "section": "Advanced Functions",
+    "question": "Which memory over-commit technique reclaims free memory from one VM and reallocates it to another VM on the same host?",
+    "options": [
+      "Transparent page sharing",
+      "Balloon driver",
+      "Memory swapping",
+      "NUMA interconnect"
+    ],
+    "correctIndex": 1,
+    "explanation": "The balloon driver (installed via CAStools in the guest OS) expands to reclaim free memory from a VM and releases it to another VM on the same host that needs more memory."
+  },
+  {
+    "id": "advanced-09",
+    "section": "Advanced Functions",
+    "question": "Which statement about synchronous remote storage replication is correct?",
+    "options": [
+      "It periodically snapshots data and ships it asynchronously, tolerating high latency links",
+      "Each I/O write completes only after both master and remote volumes confirm the write, giving the highest data integrity but adding latency",
+      "It works at the file level and requires identical filesystems on both sides",
+      "It is recommended for long-distance replication beyond 1000 km"
+    ],
+    "correctIndex": 1,
+    "explanation": "Synchronous replication releases each I/O write only after both master and remote volumes confirm completion. This gives the highest level of data integrity but reduces performance, so it is used at short distances (10-100 km)."
+  },
+  {
+    "id": "advanced-10",
+    "section": "Advanced Functions",
+    "question": "Which best describes the H3C CAS SRM homogeneous disaster recovery solution?",
+    "options": [
+      "It uses agents installed inside each VM to replicate application data over TCP",
+      "It performs continuous data protection by backing up VM disk files to a CDP appliance",
+      "It uses storage-level replication between two CAS sites with an SRA plug-in for automatic switching, agentless and managed via SRM",
+      "It requires bare optical fibers and a quorum node within 5 km between sites"
+    ],
+    "correctIndex": 2,
+    "explanation": "CAS SRM is an agentless, storage-replication-based DR solution between two CAS clusters. Storage performs the replication, and the SRA plug-in (provided by the storage vendor) enables automatic recovery switching."
+  },
+  {
+    "id": "maint-01",
+    "section": "Maintenance",
+    "question": "Which four alarm indicators are displayed in the upper-right area of the CAS main management interface?",
+    "options": [
+      "Critical, Major, Minor, and Warning",
+      "Fatal, Error, Notice, and Info",
+      "High, Medium, Low, and Trace",
+      "Urgent, Important, Normal, and Debug"
+    ],
+    "correctIndex": 0,
+    "explanation": "The CAS interface shows four alarm severity indicators: Critical Alarm, Major Alarm, Minor Alarm, and Warning."
+  },
+  {
+    "id": "maint-02",
+    "section": "Maintenance",
+    "question": "What is the purpose of the CASToolkit / iService Check?",
+    "options": [
+      "It is a real-time VM migration scheduler",
+      "It is a built-in firewall configuration utility",
+      "It is an automatic inspection tool whose results are uploaded to iService to generate a report",
+      "It is a backup tool that replaces casserver snapshots"
+    ],
+    "correctIndex": 2,
+    "explanation": "CASToolkit runs on the CVM node to inspect the platform and discover hidden issues; the result file is uploaded to the iService platform to produce a report."
+  },
+  {
+    "id": "maint-03",
+    "section": "Maintenance",
+    "question": "Which HA command is used to query the status of a specified cluster managed by the HA process?",
+    "options": [
+      "cha node-status cluster-id",
+      "cha cluster-status cluster-id",
+      "cha cluster-list cluster-id",
+      "cha status --cluster cluster-id"
+    ],
+    "correctIndex": 1,
+    "explanation": "`cha cluster-list` lists clusters, while `cha cluster-status <cluster-id>` queries the status of a specified cluster."
+  },
+  {
+    "id": "maint-04",
+    "section": "Maintenance",
+    "question": "Which statement about using virsh to start or shut down a VM in the CVK background is correct?",
+    "options": [
+      "It is the preferred method for all routine VM shutdowns",
+      "It should only be used under special circumstances when the VM cannot be operated from the foreground",
+      "It must always be paired with `service casserver restart` to take effect",
+      "It bypasses the libvirt daemon entirely"
+    ],
+    "correctIndex": 1,
+    "explanation": "The guide recommends shutting down VMs from inside the guest OS; virsh start/shutdown from the CVK background should only be used when the VM cannot be operated from the foreground."
+  },
+  {
+    "id": "maint-05",
+    "section": "Maintenance",
+    "question": "Why is it NOT recommended to modify the CVK root password by logging in through SSH?",
+    "options": [
+      "SSH cannot change Linux passwords without sudo",
+      "It will destroy the confidentiality-free (passwordless) relationship between the CVM and CVK, causing the CVK to display abnormally in the CVM foreground",
+      "It will trigger a forced reinstall of libvirtd",
+      "It will reset all VM root passwords on that host"
+    ],
+    "correctIndex": 1,
+    "explanation": "Changing the root password via SSH breaks the passwordless trust between CVM and CVK, which then makes the CVK display abnormally in the CVM foreground; the password should be changed via Edit Host."
+  },
+  {
+    "id": "maint-06",
+    "section": "Maintenance",
+    "question": "Which CPU model option provides the best guest performance but the poorest migration compatibility, requiring identical CPU models on source and target hosts?",
+    "options": [
+      "Compatible mode",
+      "Host mode",
+      "Host Passthrough mode",
+      "Hybrid mode"
+    ],
+    "correctIndex": 2,
+    "explanation": "Host Passthrough passes the physical CPU model and major features directly to the VM, offering best performance but VMs can only migrate between hosts with exactly the same CPU model."
+  },
+  {
+    "id": "maint-07",
+    "section": "Maintenance",
+    "question": "Before modifying the system time on a CAS host, which precaution does the guide explicitly warn against?",
+    "options": [
+      "Modifying the time more than one hour in the future",
+      "Modifying the time to a value in the past",
+      "Modifying time while VMs are powered off",
+      "Modifying the time without first restarting tomcat"
+    ],
+    "correctIndex": 1,
+    "explanation": "The change procedure states 'Do not modify time in the past' — only future time adjustments are allowed, with VM time-sync turned off and VMs shut down first."
+  },
+  {
+    "id": "maint-08",
+    "section": "Maintenance",
+    "question": "For an online front-end upgrade of a CAS cluster, which condition must be met regarding the storage used by running VMs?",
+    "options": [
+      "Running VMs must use local storage on the host being upgraded",
+      "Running VMs must use shared storage, otherwise the upgrade will fail",
+      "All VMs must be powered off regardless of storage type",
+      "Running VMs must be detached from their disks before upgrade"
+    ],
+    "correctIndex": 1,
+    "explanation": "For online upgrade, the running VMs must use shared storage; otherwise the upgrade will fail. Offline upgrade instead allows manual or auto shutdown of VMs."
+  },
+  {
+    "id": "maint-09",
+    "section": "Maintenance",
+    "question": "After scheduled tasks (snapshots, backups, DRX) stop running because the management host system time was edited, what is the documented fix?",
+    "options": [
+      "Reboot the entire cluster from the CVM web UI",
+      "Restart only the libvirtd daemon on every CVK",
+      "SSH to the management host and restart tomcat (service tomcat8 restart) and then casserver (service casserver restart)",
+      "Delete and recreate the scheduled tasks in the web UI"
+    ],
+    "correctIndex": 2,
+    "explanation": "The new system time differs from tomcat/casserver's time; the fix is to SSH to the management host and restart the tomcat daemon followed by the casserver daemon."
+  },
+  {
+    "id": "maint-10",
+    "section": "Maintenance",
+    "question": "A user reports a garbled CVM webpage. According to the troubleshooting guide, which solution is recommended?",
+    "options": [
+      "Reinstall the CVM management platform",
+      "Switch the management network interface to a different VLAN",
+      "Open only one tab in one browser window on the computer, and clear the browser buffer before logging in again",
+      "Restart the tomcat service on every CVK host"
+    ],
+    "correctIndex": 2,
+    "explanation": "Garbled CVM pages are caused by multiple windows/tabs, frequent window resizing, or cached content; the solution is to use a single tab in a single browser window and clear the browser buffer."
+  }
+]
