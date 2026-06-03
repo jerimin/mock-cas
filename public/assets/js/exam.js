@@ -1,12 +1,26 @@
-/* Mock exam engine — vanilla JS, single-page state machine over exam.html
+/* Mock exam engine v2 — vanilla JS, single-page state machine over exam.html
+   Schema v2: { id, section, format: "single"|"multi"|"negative", question,
+                options[], correctIndices[], explanation }
+   Sampling: stratified by module weights (full mode) or single-section (section mode)
+   Multi-answer: checkboxes + all-or-nothing scoring
    States: setup -> running -> review
-   Persists in localStorage so a refresh resumes the in-progress attempt.
+   Persists in localStorage; refresh resumes in-progress attempt.
 */
 (() => {
-  const STORAGE_KEY = "mock-cas-state-v1";
+  const STORAGE_KEY = "mock-cas-state-v2";
   const BANK_URL = "/assets/data/bank.json";
 
-  // ---- modes ----------------------------------------------------------------
+  // ---- module weights for stratified sampling (full mock) -------------------
+  const WEIGHTS = {
+    "Virtualization Introduction": 0.10,
+    "Virtualized Infrastructure": 0.20,
+    "Deploying Virtualization Platform": 0.15,
+    "Basic Functions": 0.20,
+    "Advanced Functions": 0.20,
+    "Maintenance": 0.15,
+  };
+
+  // ---- exam modes -----------------------------------------------------------
   const MODES = {
     full: {
       label: "Full mock exam",
@@ -18,7 +32,7 @@
       label: "Section practice",
       durationSec: 15 * 60,
       pickCount: 10,
-      sectionFilter: null, // filled at start
+      sectionFilter: null,
     },
   };
 
@@ -45,6 +59,36 @@
   };
 
   const letter = (i) => String.fromCharCode(65 + i);
+
+  const setsEqual = (a, b) => {
+    if (a.length !== b.length) return false;
+    const sa = new Set(a);
+    for (const x of b) if (!sa.has(x)) return false;
+    return true;
+  };
+
+  // ---- stratified sampling --------------------------------------------------
+  const stratifiedPick = (bank, attemptSize) => {
+    const sections = Object.keys(WEIGHTS);
+    const targets = {};
+    let assigned = 0;
+    for (const s of sections) {
+      targets[s] = Math.round(WEIGHTS[s] * attemptSize);
+      assigned += targets[s];
+    }
+    // fix rounding drift by adjusting the largest-weight section
+    if (assigned !== attemptSize) {
+      const diff = attemptSize - assigned;
+      const heaviest = sections.reduce((a, b) => WEIGHTS[a] >= WEIGHTS[b] ? a : b);
+      targets[heaviest] += diff;
+    }
+    const picks = [];
+    for (const s of sections) {
+      const pool = bank.filter((q) => q.section === s);
+      picks.push(...shuffle(pool).slice(0, targets[s]));
+    }
+    return shuffle(picks);
+  };
 
   // ---- state ----------------------------------------------------------------
   let bank = null;
@@ -82,8 +126,6 @@
       $("#app").innerHTML = `<div class="card"><h2>Could not load question bank.</h2><p class="muted">${String(e)}</p></div>`;
       return;
     }
-    // index by id
-    bank = bank.map((q, i) => ({ ...q, _idx: i }));
     state = loadState();
     route();
   };
@@ -101,16 +143,21 @@
   // ---- setup screen ---------------------------------------------------------
   const renderSetup = () => {
     if (timerId) { clearInterval(timerId); timerId = null; }
-    const sections = Array.from(new Set(bank.map((q) => q.section))).sort();
+    const sections = Object.keys(WEIGHTS);
     const sectionOptions = sections.map((s) => `<option value="${escapeAttr(s)}">${escapeHtml(s)}</option>`).join("");
+    const sectionRows = sections.map((s) => {
+      const count = bank.filter((q) => q.section === s).length;
+      const target = Math.round(WEIGHTS[s] * 60);
+      return `<li><span>${escapeHtml(s)}</span><span class="count">${count} in bank · ${target}/60 picked</span></li>`;
+    }).join("");
     $("#app").innerHTML = `
       <div class="hero">
         <h1>Start a mock exam</h1>
-        <p class="lede">Timed multiple-choice practice covering 6 H3C CAS modules. Your progress is saved locally — close the tab and resume any time.</p>
+        <p class="lede">Timed multiple-choice practice for the H3C CAS GB0-713 (H3CNE-Cloud) syllabus. Single-correct, multi-correct, and negative-phrasing questions. Progress saved locally — close the tab and resume any time.</p>
       </div>
       <div class="card">
         <h2>Choose a mode</h2>
-        <p class="muted">Pick a full mock for exam-day feel, or drill a single section.</p>
+        <p class="muted">Full mock pulls questions from all six modules in syllabus-weighted proportions. Section practice drills one module at a time.</p>
         <div class="toolbar">
           <label>
             Mode
@@ -125,15 +172,13 @@
           </label>
           <button class="btn-primary" id="startBtn">Start exam</button>
         </div>
-        <div class="notice">Question order and option order are shuffled every attempt. Auto-submit fires when the timer hits zero.</div>
+        <div class="notice">Question order and option order are shuffled every attempt. Auto-submit fires when the timer hits zero. Multi-answer questions are scored all-or-nothing.</div>
       </div>
 
       <div class="card">
-        <h2>Sections covered</h2>
-        <p class="muted">10 questions per section, 60 total. New attempts re-shuffle.</p>
-        <ul class="section-list">
-          ${sections.map((s) => `<li><span>${escapeHtml(s)}</span><span class="count">${bank.filter((q) => q.section === s).length}</span></li>`).join("")}
-        </ul>
+        <h2>Full mock weighting</h2>
+        <p class="muted">Each attempt covers every module by weight. Repeats minimised by within-module shuffle.</p>
+        <ul class="section-list">${sectionRows}</ul>
       </div>
     `;
     $("#modeSel").addEventListener("change", (e) => {
@@ -148,9 +193,13 @@
 
   const startExam = (modeKey, sectionFilter) => {
     const mode = MODES[modeKey];
-    let pool = bank.slice();
-    if (sectionFilter) pool = pool.filter((q) => q.section === sectionFilter);
-    pool = shuffle(pool).slice(0, mode.pickCount);
+    let pool;
+    if (modeKey === "full") {
+      pool = stratifiedPick(bank, mode.pickCount);
+    } else {
+      const sectionPool = bank.filter((q) => q.section === sectionFilter);
+      pool = shuffle(sectionPool).slice(0, mode.pickCount);
+    }
     const order = pool.map((q) => q.id);
     const optionOrder = {};
     for (const q of pool) {
@@ -163,7 +212,7 @@
       durationSec: mode.durationSec,
       order,
       optionOrder,
-      answers: {},
+      answers: {},  // qid -> number[] (positions, post-shuffle)
       marked: {},
       currentIdx: 0,
       submittedAt: null,
@@ -235,11 +284,29 @@
     }
   };
 
+  // map a question's correct ORIGINAL indices to current POSITIONS
+  const correctPositionsFor = (q) => {
+    const order = state.optionOrder[q.id];
+    return q.correctIndices.map((origIdx) => order.indexOf(origIdx)).sort((a, b) => a - b);
+  };
+
+  const isMultiSelect = (q) => q.correctIndices.length > 1;
+
+  const formatBadge = (q) => {
+    if (q.format === "single") return null;
+    if (q.format === "multi") return { text: "Select all that apply", cls: "badge-multi" };
+    // negative
+    if (q.correctIndices.length > 1) return { text: "Select all incorrect statements", cls: "badge-negative" };
+    return { text: "Pick the incorrect statement", cls: "badge-negative" };
+  };
+
   const renderQuestion = () => {
     const q = currentQuestion();
     const order = state.optionOrder[q.id];
-    const selected = state.answers[q.id];
+    const selected = state.answers[q.id] || [];
     const isMarked = !!state.marked[q.id];
+    const multi = isMultiSelect(q);
+    const badge = formatBadge(q);
     $("#qpos").textContent = String(state.currentIdx + 1);
     $("#qpane").innerHTML = `
       <div class="question">
@@ -247,17 +314,21 @@
           <span class="qsection">${escapeHtml(q.section)}</span>
           <label class="qmark"><input type="checkbox" id="markChk" ${isMarked ? "checked" : ""}> Mark for review</label>
         </div>
+        ${badge ? `<div class="qbadge ${badge.cls}">${escapeHtml(badge.text)}</div>` : ""}
         <p class="qtext">${escapeHtml(q.question)}</p>
         <ul class="options" id="optList">
-          ${order.map((origIdx, pos) => `
-            <li>
-              <label class="option ${selected === pos ? "selected" : ""}" data-pos="${pos}">
-                <input type="radio" name="opt" value="${pos}" ${selected === pos ? "checked" : ""}>
-                <span class="letter">${letter(pos)}.</span>
-                <span>${escapeHtml(q.options[origIdx])}</span>
-              </label>
-            </li>
-          `).join("")}
+          ${order.map((origIdx, pos) => {
+            const isSel = selected.includes(pos);
+            return `
+              <li>
+                <label class="option ${isSel ? "selected" : ""}" data-pos="${pos}">
+                  <input type="${multi ? "checkbox" : "radio"}" name="opt" value="${pos}" ${isSel ? "checked" : ""}>
+                  <span class="letter">${letter(pos)}.</span>
+                  <span>${escapeHtml(q.options[origIdx])}</span>
+                </label>
+              </li>
+            `;
+          }).join("")}
         </ul>
         <div class="exam-nav">
           <button id="prevBtn" ${state.currentIdx === 0 ? "disabled" : ""}>&larr; Previous</button>
@@ -272,9 +343,18 @@
       renderGrid();
     });
     $$(".option").forEach((el) => {
-      el.addEventListener("click", () => {
+      el.addEventListener("click", (e) => {
+        e.preventDefault();
         const pos = Number(el.dataset.pos);
-        state.answers[q.id] = pos;
+        let sel = (state.answers[q.id] || []).slice();
+        if (multi) {
+          if (sel.includes(pos)) sel = sel.filter((p) => p !== pos);
+          else sel.push(pos);
+        } else {
+          sel = [pos];
+        }
+        if (sel.length === 0) delete state.answers[q.id];
+        else state.answers[q.id] = sel;
         saveState();
         renderQuestion();
         renderGrid();
@@ -300,7 +380,8 @@
     if (!grid) return;
     grid.innerHTML = state.order.map((id, i) => {
       const cls = [];
-      if (state.answers[id] !== undefined) cls.push("answered");
+      const sel = state.answers[id];
+      if (sel && sel.length > 0) cls.push("answered");
       if (state.marked[id]) cls.push("marked");
       if (i === state.currentIdx) cls.push("current");
       return `<button type="button" class="${cls.join(" ")}" data-idx="${i}">${i + 1}</button>`;
@@ -312,7 +393,7 @@
 
   // ---- submit ---------------------------------------------------------------
   const confirmSubmit = () => {
-    const answered = Object.keys(state.answers).length;
+    const answered = Object.values(state.answers).filter((a) => a && a.length > 0).length;
     const total = state.order.length;
     const unanswered = total - answered;
     const marked = Object.keys(state.marked).length;
@@ -339,17 +420,17 @@
     const perSection = {};
     const items = state.order.map((id, i) => {
       const q = bank.find((x) => x.id === id);
-      const origOrder = state.optionOrder[id];
-      const selectedPos = state.answers[id];
-      const correctPos = origOrder.indexOf(q.correctIndex);
-      const isCorrect = selectedPos === correctPos;
-      const answered = selectedPos !== undefined;
+      const order = state.optionOrder[id];
+      const selected = state.answers[id] || []; // positions
+      const correctPositions = correctPositionsFor(q);
+      const isCorrect = setsEqual(selected, correctPositions);
+      const answered = selected.length > 0;
       if (isCorrect) correct++;
       const sec = q.section;
       if (!perSection[sec]) perSection[sec] = { correct: 0, total: 0 };
       perSection[sec].total++;
       if (isCorrect) perSection[sec].correct++;
-      return { i, q, origOrder, selectedPos, correctPos, isCorrect, answered };
+      return { i, q, order, selected, correctPositions, isCorrect, answered };
     });
     const pct = Math.round((correct / total) * 100);
     const passed = pct >= 70;
@@ -389,22 +470,26 @@
       </div>
     `;
 
-    $("#reviewList").innerHTML = items.map(({ i, q, origOrder, selectedPos, correctPos, isCorrect, answered }) => {
+    $("#reviewList").innerHTML = items.map(({ i, q, order, selected, correctPositions, isCorrect, answered }) => {
       const status = !answered ? "skipped" : isCorrect ? "correct" : "incorrect";
       const statusLabel = !answered ? "Skipped" : isCorrect ? "Correct" : "Incorrect";
+      const badge = formatBadge(q);
       return `
         <div class="review-q">
           <div class="qhead">
             <span class="qsection">${i + 1}. ${escapeHtml(q.section)}</span>
             <span class="qstatus ${status}">${statusLabel}</span>
           </div>
+          ${badge ? `<div class="qbadge ${badge.cls}">${escapeHtml(badge.text)}</div>` : ""}
           <p class="qtext" style="font-size:16px;">${escapeHtml(q.question)}</p>
           <ul class="options">
-            ${origOrder.map((origIdx, pos) => {
+            ${order.map((origIdx, pos) => {
+              const isCorrectOpt = correctPositions.includes(pos);
+              const isSelected = selected.includes(pos);
               const cls = [];
-              if (pos === correctPos) cls.push("correct");
-              if (pos === selectedPos && pos !== correctPos) cls.push("incorrect");
-              return `<li><div class="option ${cls.join(" ")}"><span class="letter">${letter(pos)}.</span><span>${escapeHtml(q.options[origIdx])}</span></div></li>`;
+              if (isCorrectOpt) cls.push("correct");
+              if (isSelected && !isCorrectOpt) cls.push("incorrect");
+              return `<li><div class="option ${cls.join(" ")}"><span class="letter">${letter(pos)}.</span><span>${escapeHtml(q.options[origIdx])}</span>${isSelected ? '<span class="picked">your pick</span>' : ""}</div></li>`;
             }).join("")}
           </ul>
           <div class="explanation"><strong>Why:</strong> ${escapeHtml(q.explanation)}</div>

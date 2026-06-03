@@ -267,7 +267,33 @@ main { padding: 32px 24px 80px; }
 }
 .qhead .qmark input { margin: 0; accent-color: var(--warning); }
 
+.qbadge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin: 0 0 14px;
+}
+.qbadge.badge-multi { background: var(--accent-soft); color: var(--accent); border: 1px solid #b8caf8; }
+.qbadge.badge-negative { background: var(--warning-soft); color: #8a5d10; border: 1px solid #e6c47b; }
+
 .qtext { font-size: 18px; line-height: 1.45; margin: 0 0 22px; }
+
+.option .picked {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  padding: 2px 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  align-self: center;
+}
 
 .options { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
 .option {
