@@ -64,13 +64,15 @@ The repo is pre-wired but two things must be set in the Cloudflare dashboard:
 
 1. **KV namespace** — already created (id `0239f7fd100a4699ab469f01c2526dcd`, title `mock-cas-stats`). `wrangler.jsonc` binds it as `STATS_KV`. No action needed unless the namespace is recreated.
 
-2. **Secrets** — go to Worker `mock-cas` → **Settings → Variables and Secrets** and add:
+2. **Secrets** — go to Worker `mock-cas` → **Settings → Variables and Secrets** and add the same `SMTP2GO_API_KEY` value the `clouddigit-site` Worker uses:
 
 | Name | Type | Value |
 |---|---|---|
-| `SMTP2GO_API_KEY` | Secret | Your SMTP2GO API key (`api-...`). Required for `/api/email-report`. |
-| `SMTP2GO_FROM_EMAIL` | Variable | Sender address (default `noreply@mymine.space`, override here if different) |
-| `SMTP2GO_FROM_NAME` | Variable | Sender name (default `GB0-713 Mock Exam`) |
+| `SMTP2GO_API_KEY` | Secret | Same SMTP2GO API key used by `clouddigit-site`. Required for `/api/email-report`. |
+| `SENDER_EMAIL` | Variable (optional) | Default `do-not-reply@mymine.space` (DKIM-verified for the `mymine.space` zone). |
+| `SENDER_NAME` | Variable (optional) | Default `GB0-713 Mock Exam`. |
+
+Naming matches `clouddigit-site` (`SMTP2GO_API_KEY`, `SENDER_EMAIL`, `SENDER_NAME`) so the same SMTP2GO account is reused without changes. CF Worker secrets are write-only — you can't copy the value from `clouddigit-site` via the dashboard, so paste it once into mock-cas (or fetch it from the SMTP2GO admin → API Keys panel).
 
 Without `SMTP2GO_API_KEY` the email endpoint returns 503 and the form shows an error — everything else still works.
 

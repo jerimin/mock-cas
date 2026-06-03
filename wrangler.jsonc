@@ -13,9 +13,12 @@
   "kv_namespaces": [
     { "binding": "STATS_KV", "id": "0239f7fd100a4699ab469f01c2526dcd" }
   ],
+  // Matches the env var convention used by jerimin/clouddigit-site
+  // (shared SMTP2GO account; DKIM verified for do-not-reply@mymine.space).
+  // SMTP2GO_API_KEY must be set as a Worker secret in the CF dashboard.
   "vars": {
-    "SMTP2GO_FROM_EMAIL": "noreply@mymine.space",
-    "SMTP2GO_FROM_NAME": "GB0-713 Mock Exam"
+    "SENDER_EMAIL": "do-not-reply@mymine.space",
+    "SENDER_NAME": "GB0-713 Mock Exam"
   },
   "observability": { "enabled": true }
 }

@@ -1,9 +1,9 @@
 export interface Env {
   ASSETS: Fetcher;
   STATS_KV: KVNamespace;
-  SMTP2GO_API_KEY?: string;          // set as secret in CF dashboard
-  SMTP2GO_FROM_EMAIL: string;        // default in wrangler.jsonc vars
-  SMTP2GO_FROM_NAME: string;
+  SMTP2GO_API_KEY?: string;          // set as secret in CF dashboard (shared with clouddigit-site)
+  SENDER_EMAIL?: string;             // default do-not-reply@mymine.space (DKIM-verified)
+  SENDER_NAME?: string;              // default "GB0-713 Mock Exam"
 }
 
 const CORS = {
@@ -121,10 +121,12 @@ async function emailReport(request: Request, env: Env): Promise<Response> {
   const html = renderEmailHtml(report);
   const text = renderEmailText(report);
 
+  const senderEmail = env.SENDER_EMAIL || "do-not-reply@mymine.space";
+  const senderName = env.SENDER_NAME || "GB0-713 Mock Exam";
   const payload = {
     api_key: env.SMTP2GO_API_KEY,
     to: [email],
-    sender: `${env.SMTP2GO_FROM_NAME} <${env.SMTP2GO_FROM_EMAIL}>`,
+    sender: `${senderName} <${senderEmail}>`,
     subject: `Your GB0-713 mock exam detailed report — ${report.score}/${report.total} (${report.pct}%)`,
     html_body: html,
     text_body: text,
