@@ -98,55 +98,157 @@ async function stats(env: Env): Promise<Response> {
   return j({ active: activeIds.size, unique, total, ts: Date.now() });
 }
 
-// ---------- email detailed report ----------
-async function emailReport(request: Request, env: Env): Promise<Response> {
-  if (!env.SMTP2GO_API_KEY) {
-    return j({ ok: false, error: "Email service not configured on this deployment." }, 503);
-  }
-  let body: any;
-  try {
-    body = await request.json();
-  } catch {
-    return j({ ok: false, error: "Invalid JSON body." }, 400);
-  }
-  const email = (body?.email || "").toString().trim().toLowerCase();
-  const report = body?.report;
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return j({ ok: false, error: "Invalid email address." }, 400);
-  }
-  if (!report || typeof report !== "object") {
-    return j({ ok: false, error: "Missing report payload." }, 400);
-  }
-
-  const html = renderEmailHtml(report);
-  const text = renderEmailText(report);
-
+// ---------- email send helper (SMTP2GO REST) ----------
+async function sendEmail(env: Env, to: string, subject: string, html: string, text: string): Promise<{ ok: true } | { ok: false; status: number; error: string; detail?: any }> {
+  if (!env.SMTP2GO_API_KEY) return { ok: false, status: 503, error: "Email service not configured on this deployment." };
   const senderEmail = env.SENDER_EMAIL || "do-not-reply@mymine.space";
   const senderName = env.SENDER_NAME || "GB0-713 Mock Exam";
   const payload = {
     api_key: env.SMTP2GO_API_KEY,
-    to: [email],
+    to: [to],
     sender: `${senderName} <${senderEmail}>`,
-    subject: `Your GB0-713 mock exam detailed report — ${report.score}/${report.total} (${report.pct}%)`,
+    subject,
     html_body: html,
     text_body: text,
   };
-
   const res = await fetch("https://api.smtp2go.com/v3/email/send", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(payload),
   });
-
   if (!res.ok) {
     const errText = await res.text();
-    return j({ ok: false, error: `Email provider returned ${res.status}`, detail: errText.slice(0, 400) }, 502);
+    return { ok: false, status: 502, error: `Email provider returned ${res.status}`, detail: errText.slice(0, 400) };
   }
   const data = (await res.json().catch(() => ({}))) as any;
-  if (data?.data?.succeeded >= 1) {
-    return j({ ok: true });
+  if (data?.data?.succeeded >= 1) return { ok: true };
+  return { ok: false, status: 502, error: "Email rejected by provider.", detail: data };
+}
+
+// ---------- 6-digit verification code ----------
+const CODE_TTL_SEC = 10 * 60;    // 10 minutes
+const CODE_MAX_ATTEMPTS = 5;
+
+function generateCode(): string {
+  const buf = new Uint8Array(4);
+  crypto.getRandomValues(buf);
+  const n = ((buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3]) >>> 0;
+  return String(100000 + (n % 900000));
+}
+
+function vcKey(email: string): string { return `vc:${email}`; }
+
+function emailValid(s: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+}
+
+// POST /api/email-verify-init { email, report }
+async function emailVerifyInit(request: Request, env: Env): Promise<Response> {
+  if (!env.SMTP2GO_API_KEY) return j({ ok: false, error: "Email service not configured on this deployment." }, 503);
+  let body: any;
+  try { body = await request.json(); } catch { return j({ ok: false, error: "Invalid JSON body." }, 400); }
+  const email = (body?.email || "").toString().trim().toLowerCase();
+  const report = body?.report;
+  if (!emailValid(email)) return j({ ok: false, error: "Invalid email address." }, 400);
+  if (!report || typeof report !== "object") return j({ ok: false, error: "Missing report payload." }, 400);
+
+  const code = generateCode();
+  const record = { code, report, attempts: 0, createdAt: Date.now() };
+  await env.STATS_KV.put(vcKey(email), JSON.stringify(record), { expirationTtl: CODE_TTL_SEC });
+
+  const send = await sendEmail(
+    env,
+    email,
+    `Your GB0-713 mock — verification code ${code}`,
+    renderCodeEmailHtml(code),
+    renderCodeEmailText(code),
+  );
+  if (!send.ok) return j({ ok: false, error: send.error, detail: (send as any).detail }, send.status);
+
+  return j({ ok: true, ttl: CODE_TTL_SEC });
+}
+
+// POST /api/email-verify-confirm { email, code }
+async function emailVerifyConfirm(request: Request, env: Env): Promise<Response> {
+  if (!env.SMTP2GO_API_KEY) return j({ ok: false, error: "Email service not configured on this deployment." }, 503);
+  let body: any;
+  try { body = await request.json(); } catch { return j({ ok: false, error: "Invalid JSON body." }, 400); }
+  const email = (body?.email || "").toString().trim().toLowerCase();
+  const code = (body?.code || "").toString().trim();
+  if (!emailValid(email)) return j({ ok: false, error: "Invalid email address." }, 400);
+  if (!/^\d{6}$/.test(code)) return j({ ok: false, error: "Code must be 6 digits." }, 400);
+
+  const raw = await env.STATS_KV.get(vcKey(email));
+  if (!raw) return j({ ok: false, error: "No active verification. Request a new code." }, 410);
+
+  let record: any;
+  try { record = JSON.parse(raw); } catch { record = null; }
+  if (!record || !record.code || !record.report) {
+    await env.STATS_KV.delete(vcKey(email));
+    return j({ ok: false, error: "Verification record corrupted. Request a new code." }, 500);
   }
-  return j({ ok: false, error: "Email rejected by provider.", detail: data }, 502);
+
+  if (record.attempts >= CODE_MAX_ATTEMPTS) {
+    await env.STATS_KV.delete(vcKey(email));
+    return j({ ok: false, error: "Too many failed attempts. Request a new code." }, 429);
+  }
+
+  if (record.code !== code) {
+    record.attempts = (record.attempts || 0) + 1;
+    const remaining = CODE_MAX_ATTEMPTS - record.attempts;
+    if (remaining <= 0) {
+      await env.STATS_KV.delete(vcKey(email));
+      return j({ ok: false, error: "Too many failed attempts. Request a new code." }, 429);
+    }
+    // re-store with bumped attempt count; keep TTL roughly equal to original window
+    const ageSec = Math.floor((Date.now() - (record.createdAt || Date.now())) / 1000);
+    const remainTtl = Math.max(60, CODE_TTL_SEC - ageSec);
+    await env.STATS_KV.put(vcKey(email), JSON.stringify(record), { expirationTtl: remainTtl });
+    return j({ ok: false, error: `Wrong code. ${remaining} attempt${remaining === 1 ? "" : "s"} left.` }, 401);
+  }
+
+  // Match — send the detailed report and consume the code
+  const report = record.report;
+  const html = renderEmailHtml(report);
+  const text = renderEmailText(report);
+  const send = await sendEmail(
+    env,
+    email,
+    `Your GB0-713 mock exam detailed report — ${report.score}/${report.total} (${report.pct}%)`,
+    html,
+    text,
+  );
+  // delete regardless to prevent replay
+  await env.STATS_KV.delete(vcKey(email));
+  if (!send.ok) return j({ ok: false, error: send.error, detail: (send as any).detail }, send.status);
+
+  return j({ ok: true });
+}
+
+// ---------- verification-code email body ----------
+function renderCodeEmailHtml(code: string): string {
+  return `<!doctype html>
+<html><head><meta charset="utf-8"><title>Your verification code</title></head>
+<body style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f4f5f7;margin:0;padding:32px;color:#1d2233;">
+<div style="max-width:480px;margin:0 auto;background:#fff;border-radius:12px;padding:32px;box-shadow:0 4px 24px rgba(15,20,38,.08);text-align:center;">
+  <div style="display:inline-block;background:linear-gradient(135deg,#F38020,#FAAD3F);color:#fff;font-weight:700;padding:6px 12px;border-radius:6px;font-size:12px;letter-spacing:.04em;margin-bottom:18px;">GB0-713 MOCK</div>
+  <h1 style="margin:0 0 8px;font-size:20px;">Verify your email</h1>
+  <p style="margin:0 0 24px;color:#5a6276;font-size:14px;">Enter this 6-digit code on the mock exam results page to receive your detailed report.</p>
+  <div style="display:inline-block;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:44px;font-weight:700;letter-spacing:0.18em;padding:18px 28px;background:#f6f7fb;border:1px solid #e4e7eb;border-radius:10px;color:#0f2549;">${code}</div>
+  <p style="margin:24px 0 0;color:#8b91a0;font-size:12px;">Expires in 10 minutes. If you didn't request this, ignore this email.</p>
+</div>
+</body></html>`;
+}
+
+function renderCodeEmailText(code: string): string {
+  return [
+    "GB0-713 mock exam — verification code",
+    "",
+    `Your 6-digit code: ${code}`,
+    "",
+    "Enter this code on the results page to receive your detailed report.",
+    "Expires in 10 minutes. If you didn't request this, ignore this email.",
+  ].join("\n");
 }
 
 // ---------- email renderers ----------
@@ -255,7 +357,8 @@ export default {
     if (request.method === "OPTIONS") return new Response(null, { headers: CORS });
     if (url.pathname === "/api/track" && request.method === "POST") return track(request, env);
     if (url.pathname === "/api/stats" && request.method === "GET") return stats(env);
-    if (url.pathname === "/api/email-report" && request.method === "POST") return emailReport(request, env);
+    if (url.pathname === "/api/email-verify-init" && request.method === "POST") return emailVerifyInit(request, env);
+    if (url.pathname === "/api/email-verify-confirm" && request.method === "POST") return emailVerifyConfirm(request, env);
     if (url.pathname.startsWith("/api/")) return j({ ok: false, error: "Unknown endpoint" }, 404);
     return env.ASSETS.fetch(request);
   },

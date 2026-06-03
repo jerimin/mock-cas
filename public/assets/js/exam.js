@@ -491,11 +491,8 @@
 
           <div class="card" id="emailCard">
             <h2>Email me the detailed report</h2>
-            <p class="muted">Full question-by-question review with explanations, sent to your inbox. Not stored.</p>
-            <form class="email-form" id="emailForm">
-              <input type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
-              <button class="btn btn-primary" type="submit">Send</button>
-            </form>
+            <p class="muted" id="emailLede">Enter your email — we'll send a 6-digit code to verify, then deliver the full review.</p>
+            <div id="emailSteps"></div>
             <div class="email-status" id="emailStatus"></div>
           </div>
         </div>
@@ -534,40 +531,116 @@
       </div>
     `;
 
-    // wire email form
+    // wire email verification flow
     const reportPayload = buildReportPayload(items, perSection, tally, scoreSum, scoreRounded, total, pct, passed, elapsedSec, recs);
-    $("#emailForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = $("#emailForm input[name=email]").value.trim();
-      const btn = $("#emailForm button");
-      const status = $("#emailStatus");
-      btn.disabled = true; btn.textContent = "Sending…";
-      status.textContent = ""; status.className = "email-status";
-      try {
-        const res = await fetch("/api/email-report", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ email, report: reportPayload }),
-        });
-        const data = await res.json().catch(() => ({}));
-        if (res.ok && data.ok) {
-          status.textContent = `Sent to ${email}. Check your inbox (and spam folder).`;
-          status.classList.add("ok");
-          btn.textContent = "Sent";
-        } else {
-          status.textContent = data.error || `Could not send (${res.status}).`;
-          status.classList.add("err");
-          btn.disabled = false; btn.textContent = "Send detailed report";
-        }
-      } catch (err) {
-        status.textContent = "Network error — try again.";
-        status.classList.add("err");
-        btn.disabled = false; btn.textContent = "Send detailed report";
-      }
-    });
+    const emailFlow = { email: "", step: "init" };
+    renderEmailStep("init", emailFlow, reportPayload);
 
     $("#newBtn").addEventListener("click", () => { clearState(); renderSetup(); });
     $("#exitBtn").addEventListener("click", () => { clearState(); window.location.href = "/"; });
+  };
+
+  const maskEmail = (e) => {
+    const [name, domain] = e.split("@");
+    if (!name || !domain) return e;
+    const masked = name.length <= 2 ? name[0] + "*" : name[0] + "***" + name[name.length - 1];
+    return `${masked}@${domain}`;
+  };
+
+  const renderEmailStep = (step, flow, reportPayload) => {
+    const lede = $("#emailLede");
+    const stepsEl = $("#emailSteps");
+    const status = $("#emailStatus");
+    status.textContent = ""; status.className = "email-status";
+    if (step === "init") {
+      lede.textContent = "Enter your email — we'll send a 6-digit code to verify, then deliver the full review.";
+      stepsEl.innerHTML = `
+        <form class="email-form" id="initForm">
+          <input type="email" name="email" placeholder="you@example.com" autocomplete="email" required value="${escapeAttr(flow.email)}">
+          <button class="btn btn-primary" type="submit">Send code</button>
+        </form>
+      `;
+      $("#initForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = $("#initForm input[name=email]").value.trim().toLowerCase();
+        const btn = $("#initForm button");
+        btn.disabled = true; btn.textContent = "Sending…";
+        try {
+          const res = await fetch("/api/email-verify-init", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ email, report: reportPayload }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (res.ok && data.ok) {
+            flow.email = email;
+            flow.step = "code";
+            renderEmailStep("code", flow, reportPayload);
+          } else {
+            status.textContent = data.error || `Could not send code (${res.status}).`;
+            status.classList.add("err");
+            btn.disabled = false; btn.textContent = "Send code";
+          }
+        } catch {
+          status.textContent = "Network error — try again.";
+          status.classList.add("err");
+          btn.disabled = false; btn.textContent = "Send code";
+        }
+      });
+    } else if (step === "code") {
+      lede.innerHTML = `Code sent to <strong>${escapeHtml(maskEmail(flow.email))}</strong>. Check your inbox (and spam folder), then enter the 6-digit code.`;
+      stepsEl.innerHTML = `
+        <form class="email-form code-form" id="codeForm">
+          <input type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" name="code" placeholder="123456" required autocomplete="one-time-code" autofocus>
+          <button class="btn btn-primary" type="submit">Verify &amp; send report</button>
+        </form>
+        <div style="margin-top:8px;font-size:12px;">
+          <a href="#" id="changeEmail">Use a different email</a>
+        </div>
+      `;
+      $("#codeForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const code = $("#codeForm input[name=code]").value.trim();
+        const btn = $("#codeForm button");
+        btn.disabled = true; btn.textContent = "Verifying…";
+        try {
+          const res = await fetch("/api/email-verify-confirm", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ email: flow.email, code }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (res.ok && data.ok) {
+            flow.step = "done";
+            renderEmailStep("done", flow, reportPayload);
+          } else {
+            status.textContent = data.error || `Could not verify (${res.status}).`;
+            status.classList.add("err");
+            btn.disabled = false; btn.textContent = "Verify & send report";
+            if (res.status === 410 || res.status === 429) {
+              setTimeout(() => { flow.step = "init"; renderEmailStep("init", flow, reportPayload); }, 1500);
+            }
+          }
+        } catch {
+          status.textContent = "Network error — try again.";
+          status.classList.add("err");
+          btn.disabled = false; btn.textContent = "Verify & send report";
+        }
+      });
+      $("#changeEmail").addEventListener("click", (e) => {
+        e.preventDefault();
+        flow.step = "init";
+        renderEmailStep("init", flow, reportPayload);
+      });
+    } else if (step === "done") {
+      lede.textContent = "Verified. Your detailed report is on the way.";
+      stepsEl.innerHTML = `
+        <div class="email-success">
+          <strong>Sent to ${escapeHtml(maskEmail(flow.email))}</strong>
+          <p>Check your inbox (and spam folder). The detailed report has a section breakdown, recommendations, and every question with the correct answer and explanation.</p>
+        </div>
+      `;
+    }
   };
 
   const buildReportPayload = (items, perSection, tally, scoreSum, scoreRounded, total, pct, passed, elapsedSec, recs) => {
