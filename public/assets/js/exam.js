@@ -1,16 +1,14 @@
-/* Mock exam engine v2 — vanilla JS, single-page state machine over exam.html
-   Schema v2: { id, section, format: "single"|"multi"|"negative", question,
-                options[], correctIndices[], explanation }
-   Sampling: stratified by module weights (full mode) or single-section (section mode)
-   Multi-answer: checkboxes + all-or-nothing scoring
+/* Mock exam engine v3 — GB0-713 policy (50Q / 60min / 60% pass)
+   Schema: { id, section, format, question, options[], correctIndices[], explanation }
+   Sampling: stratified by module weights (full mode)
+   Scoring: 1.0 / partial (0..1) for multi / 0 incorrect / 0 skipped
    States: setup -> running -> review
-   Persists in localStorage; refresh resumes in-progress attempt.
 */
 (() => {
-  const STORAGE_KEY = "mock-cas-state-v2";
+  const STORAGE_KEY = "mock-cas-state-v3";
   const BANK_URL = "/assets/data/bank.json";
+  const PASS_PCT = 60;
 
-  // ---- module weights for stratified sampling (full mock) -------------------
   const WEIGHTS = {
     "Virtualization Introduction": 0.10,
     "Virtualized Infrastructure": 0.20,
@@ -20,23 +18,20 @@
     "Maintenance": 0.15,
   };
 
-  // ---- exam modes -----------------------------------------------------------
-  const MODES = {
-    full: {
-      label: "Full mock exam",
-      durationSec: 90 * 60,
-      pickCount: 60,
-      sectionFilter: null,
-    },
-    section: {
-      label: "Section practice",
-      durationSec: 15 * 60,
-      pickCount: 10,
-      sectionFilter: null,
-    },
+  const STUDY_HINTS = {
+    "Virtualization Introduction": "Re-read the cloud-computing basics (5 features, deployment models), the IaaS/PaaS/SaaS layering, and H3C's CAS/SDN/ONEStor product mapping.",
+    "Virtualized Infrastructure": "Drill compute (CPU clock, RAID modes, FBWC/BBWC), storage (iSCSI 3260, FC ports, RAID 5/6 disk math, multi-path) and network (VLAN, static vs dynamic link aggregation).",
+    "Deploying Virtualization Platform": "Lock down the 3-step deployment process, hardware prereqs (hardware-assisted virtualization), management vs business network port roles, and CASToolkit / template-vs-clone behavior.",
+    "Basic Functions": "Practise the resource hierarchy (host pool/cluster/host/VM), CPU modes (Compatible/Host/Host-Passthrough), cache modes (writeback/writethrough/none/directsync), backup types and vFW/ACL precedence.",
+    "Advanced Functions": "Memorise HA detection (CVK→shared storage) + 3-retry cycle, FT vs HA, DRS metrics (CPU/memory/network), DPM/SR-IOV prereqs, sync vs async replication, and Active-Active 5km/1ms limit.",
+    "Maintenance": "Memorise the cha commands, ovs-vsctl/ovs-appctl flags, log paths (/var/log/libvirt/..., Ocfs2_shell_XX.log), alarm levels (Critical/Major/Minor/Warning), and CASToolkit + iService flow.",
   };
 
-  // ---- utilities ------------------------------------------------------------
+  const MODES = {
+    full: { label: "Full mock exam", durationSec: 60 * 60, pickCount: 50, sectionFilter: null },
+    section: { label: "Section practice", durationSec: 15 * 60, pickCount: 10, sectionFilter: null },
+  };
+
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
@@ -67,7 +62,7 @@
     return true;
   };
 
-  // ---- stratified sampling --------------------------------------------------
+  // ---- stratified pick ------------------------------------------------------
   const stratifiedPick = (bank, attemptSize) => {
     const sections = Object.keys(WEIGHTS);
     const targets = {};
@@ -76,10 +71,9 @@
       targets[s] = Math.round(WEIGHTS[s] * attemptSize);
       assigned += targets[s];
     }
-    // fix rounding drift by adjusting the largest-weight section
     if (assigned !== attemptSize) {
       const diff = attemptSize - assigned;
-      const heaviest = sections.reduce((a, b) => WEIGHTS[a] >= WEIGHTS[b] ? a : b);
+      const heaviest = sections.reduce((a, b) => (WEIGHTS[a] >= WEIGHTS[b] ? a : b));
       targets[heaviest] += diff;
     }
     const picks = [];
@@ -102,20 +96,10 @@
       const parsed = JSON.parse(raw);
       if (!parsed || !parsed.order || !parsed.startedAt) return null;
       return parsed;
-    } catch {
-      return null;
-    }
+    } catch { return null; }
   };
-
-  const saveState = () => {
-    if (!state) return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  };
-
-  const clearState = () => {
-    localStorage.removeItem(STORAGE_KEY);
-    state = null;
-  };
+  const saveState = () => { if (state) localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); };
+  const clearState = () => { localStorage.removeItem(STORAGE_KEY); state = null; };
 
   // ---- bootstrap ------------------------------------------------------------
   const init = async () => {
@@ -131,38 +115,45 @@
   };
 
   const route = () => {
-    if (state && !state.submittedAt) {
-      renderRunning();
-    } else if (state && state.submittedAt) {
-      renderReview();
-    } else {
-      renderSetup();
-    }
+    if (state && !state.submittedAt) renderRunning();
+    else if (state && state.submittedAt) renderReview();
+    else renderSetup();
   };
 
-  // ---- setup screen ---------------------------------------------------------
+  // ---- setup ----------------------------------------------------------------
   const renderSetup = () => {
     if (timerId) { clearInterval(timerId); timerId = null; }
     const sections = Object.keys(WEIGHTS);
     const sectionOptions = sections.map((s) => `<option value="${escapeAttr(s)}">${escapeHtml(s)}</option>`).join("");
     const sectionRows = sections.map((s) => {
       const count = bank.filter((q) => q.section === s).length;
-      const target = Math.round(WEIGHTS[s] * 60);
-      return `<li><span>${escapeHtml(s)}</span><span class="count">${count} in bank · ${target}/60 picked</span></li>`;
+      const target = Math.round(WEIGHTS[s] * 50);
+      return `<li><span>${escapeHtml(s)}</span><span class="count">${count} in bank · ${target}/50 picked</span></li>`;
     }).join("");
     $("#app").innerHTML = `
       <div class="hero">
-        <h1>Start a mock exam</h1>
-        <p class="lede">Timed multiple-choice practice for the H3C CAS GB0-713 (H3CNE-Cloud) syllabus. Single-correct, multi-correct, and negative-phrasing questions. Progress saved locally — close the tab and resume any time.</p>
+        <h1>Start a <span class="accent">mock exam</span></h1>
+        <p class="lede">Timed practice for GB0-713 — Deploy and Manage the H3C CAS Virtualization Platform (H3CNE-Cloud). Format and policy mirror the real exam.</p>
+        <div class="ctas">
+          <button class="btn btn-primary" id="startNow">Start full mock &rarr;</button>
+        </div>
+        <div class="exam-meta" aria-label="Exam policy">
+          <div class="item"><span class="label">Questions</span><span class="value">50</span></div>
+          <div class="item"><span class="label">Duration</span><span class="value">60 min</span></div>
+          <div class="item"><span class="label">Pass mark</span><span class="value">60%</span></div>
+          <div class="item"><span class="label">Format</span><span class="value">Single + multi</span></div>
+          <div class="item"><span class="label">Scoring</span><span class="value">Partial credit</span></div>
+        </div>
       </div>
+
       <div class="card">
         <h2>Choose a mode</h2>
-        <p class="muted">Full mock pulls questions from all six modules in syllabus-weighted proportions. Section practice drills one module at a time.</p>
+        <p class="muted">Full mock pulls 50 questions weighted across the six modules. Section practice drills one module at a time.</p>
         <div class="toolbar">
           <label>
             Mode
             <select id="modeSel">
-              <option value="full">Full mock — 60 questions, 90 minutes</option>
+              <option value="full">Full mock — 50 questions, 60 minutes</option>
               <option value="section">Section practice — 10 questions, 15 minutes</option>
             </select>
           </label>
@@ -170,25 +161,27 @@
             Section
             <select id="sectionSel">${sectionOptions}</select>
           </label>
-          <button class="btn-primary" id="startBtn">Start exam</button>
+          <button class="btn btn-primary" id="startBtn">Start exam</button>
         </div>
-        <div class="notice">Question order and option order are shuffled every attempt. Auto-submit fires when the timer hits zero. Multi-answer questions are scored all-or-nothing.</div>
+        <div class="notice">Question order and option order are shuffled every attempt. Multi-answer questions earn partial credit (correct picks minus wrong picks, floored at 0). Auto-submit fires at the timer zero.</div>
       </div>
 
       <div class="card">
         <h2>Full mock weighting</h2>
-        <p class="muted">Each attempt covers every module by weight. Repeats minimised by within-module shuffle.</p>
+        <p class="muted">Each attempt covers every module by syllabus weight. Within-module shuffle minimises repeats.</p>
         <ul class="section-list">${sectionRows}</ul>
       </div>
     `;
-    $("#modeSel").addEventListener("change", (e) => {
-      $("#sectionWrap").classList.toggle("hidden", e.target.value !== "section");
-    });
-    $("#startBtn").addEventListener("click", () => {
+    const startFn = () => {
       const mode = $("#modeSel").value;
       const sectionFilter = mode === "section" ? $("#sectionSel").value : null;
       startExam(mode, sectionFilter);
+    };
+    $("#modeSel").addEventListener("change", (e) => {
+      $("#sectionWrap").classList.toggle("hidden", e.target.value !== "section");
     });
+    $("#startBtn").addEventListener("click", startFn);
+    $("#startNow").addEventListener("click", () => startExam("full", null));
   };
 
   const startExam = (modeKey, sectionFilter) => {
@@ -202,9 +195,7 @@
     }
     const order = pool.map((q) => q.id);
     const optionOrder = {};
-    for (const q of pool) {
-      optionOrder[q.id] = shuffle(q.options.map((_, i) => i));
-    }
+    for (const q of pool) optionOrder[q.id] = shuffle(q.options.map((_, i) => i));
     state = {
       mode: modeKey,
       sectionFilter,
@@ -212,7 +203,7 @@
       durationSec: mode.durationSec,
       order,
       optionOrder,
-      answers: {},  // qid -> number[] (positions, post-shuffle)
+      answers: {},
       marked: {},
       currentIdx: 0,
       submittedAt: null,
@@ -221,17 +212,18 @@
     renderRunning();
   };
 
-  // ---- running screen -------------------------------------------------------
+  // ---- running --------------------------------------------------------------
   const renderRunning = () => {
     if (timerId) { clearInterval(timerId); timerId = null; }
     $("#app").innerHTML = `
       <div class="exam-topbar">
         <div class="crumbs">
-          <strong>${escapeHtml(MODES[state.mode].label)}</strong>${state.sectionFilter ? ` — ${escapeHtml(state.sectionFilter)}` : ""} · Question <span id="qpos"></span> of ${state.order.length}
+          <strong>${escapeHtml(MODES[state.mode].label)}</strong>${state.sectionFilter ? ` — ${escapeHtml(state.sectionFilter)}` : ""} · Q <span id="qpos"></span> / ${state.order.length}
         </div>
-        <div style="display:flex;gap:10px;align-items:center;">
+        <div class="controls">
           <div class="timer" id="timer">--:--</div>
-          <button class="btn-ghost" id="exitBtn" title="Abandon attempt">Exit</button>
+          <button class="btn-danger" id="endBtn" title="Submit now and view results">End exam</button>
+          <button class="btn btn-ghost" id="exitBtn" title="Abandon attempt, discard answers">Abandon</button>
         </div>
       </div>
       <div class="exam-shell">
@@ -242,10 +234,12 @@
             <div class="legend">
               <div><span class="swatch sw-unanswered"></span> Unanswered</div>
               <div><span class="swatch sw-answered"></span> Answered</div>
-              <div><span class="swatch sw-marked"></span> Marked for review</div>
+              <div><span class="swatch sw-marked"></span> Marked</div>
             </div>
             <div class="qgrid" id="qgrid"></div>
-            <button class="btn-primary" style="width:100%;" id="submitBtn">Submit exam</button>
+            <div class="sidebar-actions">
+              <button class="btn btn-primary" id="submitBtn">End exam &amp; see results</button>
+            </div>
           </div>
         </aside>
       </div>
@@ -255,19 +249,17 @@
     tickTimer();
     timerId = setInterval(tickTimer, 1000);
 
-    $("#submitBtn").addEventListener("click", confirmSubmit);
+    $("#submitBtn").addEventListener("click", confirmEnd);
+    $("#endBtn").addEventListener("click", confirmEnd);
     $("#exitBtn").addEventListener("click", () => {
-      if (confirm("Abandon this attempt? Your progress will be cleared.")) {
+      if (confirm("Abandon this attempt? Your answers will be cleared and no result will be saved.")) {
         clearState();
         renderSetup();
       }
     });
   };
 
-  const currentQuestion = () => {
-    const id = state.order[state.currentIdx];
-    return bank.find((q) => q.id === id);
-  };
+  const currentQuestion = () => bank.find((q) => q.id === state.order[state.currentIdx]);
 
   const tickTimer = () => {
     const elapsed = (Date.now() - state.startedAt) / 1000;
@@ -275,8 +267,8 @@
     const el = $("#timer");
     if (!el) return;
     el.textContent = fmtTime(remain);
-    el.classList.toggle("warn", remain <= 600 && remain > 60);
-    el.classList.toggle("urgent", remain <= 60);
+    el.classList.toggle("warn", remain <= 600 && remain > 120);
+    el.classList.toggle("urgent", remain <= 120);
     if (remain <= 0) {
       clearInterval(timerId);
       timerId = null;
@@ -284,7 +276,6 @@
     }
   };
 
-  // map a question's correct ORIGINAL indices to current POSITIONS
   const correctPositionsFor = (q) => {
     const order = state.optionOrder[q.id];
     return q.correctIndices.map((origIdx) => order.indexOf(origIdx)).sort((a, b) => a - b);
@@ -295,7 +286,6 @@
   const formatBadge = (q) => {
     if (q.format === "single") return null;
     if (q.format === "multi") return { text: "Select all that apply", cls: "badge-multi" };
-    // negative
     if (q.correctIndices.length > 1) return { text: "Select all incorrect statements", cls: "badge-negative" };
     return { text: "Pick the incorrect statement", cls: "badge-negative" };
   };
@@ -332,7 +322,7 @@
         </ul>
         <div class="exam-nav">
           <button id="prevBtn" ${state.currentIdx === 0 ? "disabled" : ""}>&larr; Previous</button>
-          <button class="btn-primary" id="nextBtn">${state.currentIdx === state.order.length - 1 ? "Review &amp; submit" : "Next &rarr;"}</button>
+          <button class="btn btn-primary" id="nextBtn">${state.currentIdx === state.order.length - 1 ? "Review &amp; end" : "Next &rarr;"}</button>
         </div>
       </div>
     `;
@@ -362,7 +352,7 @@
     });
     $("#prevBtn").addEventListener("click", () => goTo(state.currentIdx - 1));
     $("#nextBtn").addEventListener("click", () => {
-      if (state.currentIdx === state.order.length - 1) confirmSubmit();
+      if (state.currentIdx === state.order.length - 1) confirmEnd();
       else goTo(state.currentIdx + 1);
     });
   };
@@ -386,21 +376,19 @@
       if (i === state.currentIdx) cls.push("current");
       return `<button type="button" class="${cls.join(" ")}" data-idx="${i}">${i + 1}</button>`;
     }).join("");
-    $$("#qgrid button").forEach((btn) => {
-      btn.addEventListener("click", () => goTo(Number(btn.dataset.idx)));
-    });
+    $$("#qgrid button").forEach((btn) => btn.addEventListener("click", () => goTo(Number(btn.dataset.idx))));
   };
 
-  // ---- submit ---------------------------------------------------------------
-  const confirmSubmit = () => {
+  // ---- end / submit ---------------------------------------------------------
+  const confirmEnd = () => {
     const answered = Object.values(state.answers).filter((a) => a && a.length > 0).length;
     const total = state.order.length;
     const unanswered = total - answered;
-    const marked = Object.keys(state.marked).length;
     showModal({
-      title: "Submit exam?",
-      body: `${answered}/${total} answered, ${unanswered} skipped, ${marked} marked for review. Once submitted you'll see your score and explanations.`,
-      confirmLabel: "Submit",
+      title: "End exam now?",
+      body: `${answered}/${total} answered · ${unanswered} skipped. Once you end, you'll see your score and a summary of areas to improve.`,
+      confirmLabel: "End and see results",
+      confirmCls: "btn-primary",
       onConfirm: () => submitExam(false),
     });
   };
@@ -412,103 +400,204 @@
     renderReview();
   };
 
-  // ---- review screen --------------------------------------------------------
+  // ---- scoring --------------------------------------------------------------
+  const scoreQuestion = (q, selectedPositions, correctPositions) => {
+    if (selectedPositions.length === 0) return { score: 0, status: "skipped" };
+    const correctSet = new Set(correctPositions);
+    const selSet = new Set(selectedPositions);
+    const correctPicked = selectedPositions.filter((p) => correctSet.has(p)).length;
+    const wrongPicked = selectedPositions.length - correctPicked;
+    if (correctPositions.length === 1) {
+      // single-pick: must be the exact one
+      const ok = setsEqual(selectedPositions, correctPositions);
+      return { score: ok ? 1 : 0, status: ok ? "correct" : "incorrect" };
+    }
+    // multi-pick: partial credit
+    const raw = (correctPicked - wrongPicked) / correctPositions.length;
+    const score = Math.max(0, Math.min(1, raw));
+    let status;
+    if (score === 1) status = "correct";
+    else if (score === 0) status = "incorrect";
+    else status = "partial";
+    return { score, status };
+  };
+
+  // ---- recommendations ------------------------------------------------------
+  const buildRecommendations = (perSection) => {
+    const sorted = Object.entries(perSection)
+      .map(([section, v]) => ({ section, ...v, pct: Math.round((v.score / v.total) * 100) }))
+      .sort((a, b) => a.pct - b.pct);
+    const weakest = sorted.filter((s) => s.pct < 70).slice(0, 3).map((s) => ({
+      section: s.section,
+      pct: s.pct,
+      advice: STUDY_HINTS[s.section] || "Re-read this module and re-take section practice until consistently above 80%.",
+    }));
+    return weakest;
+  };
+
+  // ---- review ---------------------------------------------------------------
   const renderReview = () => {
     if (timerId) { clearInterval(timerId); timerId = null; }
     const total = state.order.length;
-    let correct = 0;
+    let scoreSum = 0;
+    const tally = { correct: 0, partial: 0, incorrect: 0, skipped: 0 };
     const perSection = {};
+
     const items = state.order.map((id, i) => {
       const q = bank.find((x) => x.id === id);
       const order = state.optionOrder[id];
-      const selected = state.answers[id] || []; // positions
+      const selected = state.answers[id] || [];
       const correctPositions = correctPositionsFor(q);
-      const isCorrect = setsEqual(selected, correctPositions);
-      const answered = selected.length > 0;
-      if (isCorrect) correct++;
+      const { score, status } = scoreQuestion(q, selected, correctPositions);
+      scoreSum += score;
+      tally[status]++;
       const sec = q.section;
-      if (!perSection[sec]) perSection[sec] = { correct: 0, total: 0 };
+      if (!perSection[sec]) perSection[sec] = { score: 0, correct: 0, partial: 0, incorrect: 0, skipped: 0, total: 0 };
       perSection[sec].total++;
-      if (isCorrect) perSection[sec].correct++;
-      return { i, q, order, selected, correctPositions, isCorrect, answered };
+      perSection[sec].score += score;
+      perSection[sec][status]++;
+      return { i, q, order, selected, correctPositions, score, status };
     });
-    const pct = Math.round((correct / total) * 100);
-    const passed = pct >= 70;
+
+    const scoreRounded = Math.round(scoreSum * 10) / 10;
+    const pct = Math.round((scoreSum / total) * 100);
+    const passed = pct >= PASS_PCT;
     const elapsedSec = Math.round((state.submittedAt - state.startedAt) / 1000);
+    const recs = buildRecommendations(perSection);
 
     $("#app").innerHTML = `
       <div class="card score-card">
-        <div><span class="score">${correct}</span><span class="out-of">/${total}</span></div>
-        <div class="muted">${pct}% — ${state.autoSubmit ? "auto-submitted at time-up" : "submitted"}, took ${fmtTime(elapsedSec)}</div>
-        <div class="verdict ${passed ? "pass" : "fail"}">${passed ? "Pass (≥70%)" : "Below pass mark (70%)"}</div>
-        <div style="margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
-          <button class="btn-primary" id="newBtn">New attempt</button>
-          <button id="exitBtn">Back to start</button>
+        <div class="scoreline"><span class="score">${scoreRounded}</span><span class="out-of">/${total}</span></div>
+        <div class="pct-line">${pct}% — ${state.autoSubmit ? "auto-submitted at time-up" : "submitted"}, took ${fmtTime(elapsedSec)}</div>
+        <div class="verdict ${passed ? "pass" : "fail"}">${passed ? `Pass · ≥${PASS_PCT}%` : `Below pass mark · ${PASS_PCT}% required`}</div>
+        <div class="tallies">
+          <div class="tally correct"><div class="label">Correct</div><div class="value">${tally.correct}</div></div>
+          <div class="tally partial"><div class="label">Partial</div><div class="value">${tally.partial}</div></div>
+          <div class="tally incorrect"><div class="label">Incorrect</div><div class="value">${tally.incorrect}</div></div>
+          <div class="tally skipped"><div class="label">Skipped</div><div class="value">${tally.skipped}</div></div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" id="newBtn">New attempt</button>
+          <button class="btn" id="exitBtn">Back to start</button>
         </div>
       </div>
 
       <div class="card breakdown">
         <h2>Section breakdown</h2>
         <table>
-          <thead><tr><th>Section</th><th class="num">Score</th><th class="num">%</th></tr></thead>
+          <thead><tr><th>Section</th><th class="num">Correct</th><th class="num">Partial</th><th class="num">Wrong</th><th class="num">%</th><th class="bar-cell"></th></tr></thead>
           <tbody>
-            ${Object.entries(perSection).map(([s, v]) => `
-              <tr>
+            ${Object.entries(perSection).map(([s, v]) => {
+              const pp = Math.round((v.score / v.total) * 100);
+              const barCls = pp >= 80 ? "strong" : pp < 60 ? "weak" : "";
+              return `<tr>
                 <td>${escapeHtml(s)}</td>
-                <td class="num">${v.correct} / ${v.total}</td>
-                <td class="num">${Math.round((v.correct / v.total) * 100)}%</td>
-              </tr>
-            `).join("")}
+                <td class="num">${v.correct}</td>
+                <td class="num">${v.partial}</td>
+                <td class="num">${v.incorrect}</td>
+                <td class="num"><strong>${pp}%</strong></td>
+                <td class="bar-cell"><div class="bar ${barCls}"><span style="width:${pp}%"></span></div></td>
+              </tr>`;
+            }).join("")}
           </tbody>
         </table>
       </div>
 
       <div class="card">
-        <h2>Review</h2>
-        <p class="muted">Each question with your answer, the correct answer, and the explanation.</p>
-        <div id="reviewList"></div>
+        <h2>Recommendations</h2>
+        <p class="muted">${recs.length === 0 ? "Strong across every module — review weak distractors to lock it in." : "Focus on these modules before retaking."}</p>
+        <div class="recs">
+          ${recs.length === 0
+            ? `<div class="rec strong"><h4>You're exam-ready</h4><p>Every module above 70%. Run another shuffled mock to verify consistency.</p></div>`
+            : recs.map((r) => `<div class="rec ${r.pct < 50 ? "weak" : "medium"}"><h4>${escapeHtml(r.section)} — ${r.pct}%</h4><p>${escapeHtml(r.advice)}</p></div>`).join("")}
+        </div>
+      </div>
+
+      <div class="card" id="emailCard">
+        <h2>Email me the detailed report</h2>
+        <p class="muted">Question-by-question breakdown with explanations, sent to your inbox. Not stored anywhere.</p>
+        <form class="email-form" id="emailForm">
+          <input type="email" name="email" placeholder="you@example.com" autocomplete="email" required>
+          <button class="btn btn-primary" type="submit">Send detailed report</button>
+        </form>
+        <div class="email-status" id="emailStatus"></div>
       </div>
     `;
 
-    $("#reviewList").innerHTML = items.map(({ i, q, order, selected, correctPositions, isCorrect, answered }) => {
-      const status = !answered ? "skipped" : isCorrect ? "correct" : "incorrect";
-      const statusLabel = !answered ? "Skipped" : isCorrect ? "Correct" : "Incorrect";
-      const badge = formatBadge(q);
-      return `
-        <div class="review-q">
-          <div class="qhead">
-            <span class="qsection">${i + 1}. ${escapeHtml(q.section)}</span>
-            <span class="qstatus ${status}">${statusLabel}</span>
-          </div>
-          ${badge ? `<div class="qbadge ${badge.cls}">${escapeHtml(badge.text)}</div>` : ""}
-          <p class="qtext" style="font-size:16px;">${escapeHtml(q.question)}</p>
-          <ul class="options">
-            ${order.map((origIdx, pos) => {
-              const isCorrectOpt = correctPositions.includes(pos);
-              const isSelected = selected.includes(pos);
-              const cls = [];
-              if (isCorrectOpt) cls.push("correct");
-              if (isSelected && !isCorrectOpt) cls.push("incorrect");
-              return `<li><div class="option ${cls.join(" ")}"><span class="letter">${letter(pos)}.</span><span>${escapeHtml(q.options[origIdx])}</span>${isSelected ? '<span class="picked">your pick</span>' : ""}</div></li>`;
-            }).join("")}
-          </ul>
-          <div class="explanation"><strong>Why:</strong> ${escapeHtml(q.explanation)}</div>
-        </div>
-      `;
-    }).join("");
+    // wire email form
+    const reportPayload = buildReportPayload(items, perSection, tally, scoreSum, scoreRounded, total, pct, passed, elapsedSec, recs);
+    $("#emailForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = $("#emailForm input[name=email]").value.trim();
+      const btn = $("#emailForm button");
+      const status = $("#emailStatus");
+      btn.disabled = true; btn.textContent = "Sending…";
+      status.textContent = ""; status.className = "email-status";
+      try {
+        const res = await fetch("/api/email-report", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ email, report: reportPayload }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.ok) {
+          status.textContent = `Sent to ${email}. Check your inbox (and spam folder).`;
+          status.classList.add("ok");
+          btn.textContent = "Sent";
+        } else {
+          status.textContent = data.error || `Could not send (${res.status}).`;
+          status.classList.add("err");
+          btn.disabled = false; btn.textContent = "Send detailed report";
+        }
+      } catch (err) {
+        status.textContent = "Network error — try again.";
+        status.classList.add("err");
+        btn.disabled = false; btn.textContent = "Send detailed report";
+      }
+    });
 
-    $("#newBtn").addEventListener("click", () => {
-      clearState();
-      renderSetup();
-    });
-    $("#exitBtn").addEventListener("click", () => {
-      clearState();
-      window.location.href = "/";
-    });
+    $("#newBtn").addEventListener("click", () => { clearState(); renderSetup(); });
+    $("#exitBtn").addEventListener("click", () => { clearState(); window.location.href = "/"; });
+  };
+
+  const buildReportPayload = (items, perSection, tally, scoreSum, scoreRounded, total, pct, passed, elapsedSec, recs) => {
+    const perSectionArr = Object.entries(perSection).map(([section, v]) => ({
+      section,
+      correct: v.correct,
+      partial: v.partial,
+      incorrect: v.incorrect,
+      skipped: v.skipped,
+      total: v.total,
+      pct: Math.round((v.score / v.total) * 100),
+    }));
+    const detailedItems = items.map((it) => ({
+      idx: it.i + 1,
+      section: it.q.section,
+      question: it.q.question,
+      options: it.order.map((origIdx, pos) => `${letter(pos)}. ${it.q.options[origIdx]}`),
+      correctLetters: it.correctPositions.map(letter),
+      pickedLetters: it.selected.slice().sort((a, b) => a - b).map(letter),
+      status: it.status,
+      explanation: it.q.explanation,
+    }));
+    return {
+      score: scoreRounded,
+      total,
+      pct,
+      passed,
+      tookFmt: fmtTime(elapsedSec),
+      correctCount: tally.correct,
+      partialCount: tally.partial,
+      incorrectCount: tally.incorrect,
+      skippedCount: tally.skipped,
+      perSection: perSectionArr,
+      weakest: recs,
+      items: detailedItems,
+    };
   };
 
   // ---- modal ----------------------------------------------------------------
-  const showModal = ({ title, body, confirmLabel, onConfirm }) => {
+  const showModal = ({ title, body, confirmLabel, confirmCls = "btn-primary", onConfirm }) => {
     const root = document.createElement("div");
     root.className = "modal-backdrop";
     root.innerHTML = `
@@ -517,7 +606,7 @@
         <p>${escapeHtml(body)}</p>
         <div class="modal-actions">
           <button id="mCancel">Cancel</button>
-          <button class="btn-primary" id="mConfirm">${escapeHtml(confirmLabel)}</button>
+          <button class="btn ${confirmCls}" id="mConfirm">${escapeHtml(confirmLabel)}</button>
         </div>
       </div>
     `;
@@ -534,6 +623,6 @@
   }[c]));
   const escapeAttr = (s) => escapeHtml(s);
 
-  // ---- go -------------------------------------------------------------------
-  document.addEventListener("DOMContentLoaded", init);
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
 })();
