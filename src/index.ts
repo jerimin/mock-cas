@@ -1,3 +1,5 @@
+import { buildReportPdf, uint8ToBase64 } from "./pdf";
+
 export interface Env {
   ASSETS: Fetcher;
   STATS_KV: KVNamespace;
@@ -99,11 +101,12 @@ async function stats(env: Env): Promise<Response> {
 }
 
 // ---------- email send helper (SMTP2GO REST) ----------
-async function sendEmail(env: Env, to: string, subject: string, html: string, text: string): Promise<{ ok: true } | { ok: false; status: number; error: string; detail?: any }> {
+interface Attachment { filename: string; fileblob: string; mimetype: string; }
+async function sendEmail(env: Env, to: string, subject: string, html: string, text: string, attachments?: Attachment[]): Promise<{ ok: true } | { ok: false; status: number; error: string; detail?: any }> {
   if (!env.SMTP2GO_API_KEY) return { ok: false, status: 503, error: "Email service not configured on this deployment." };
   const senderEmail = env.SENDER_EMAIL || "do-not-reply@mymine.space";
   const senderName = env.SENDER_NAME || "GB0-713 Mock Exam";
-  const payload = {
+  const payload: Record<string, any> = {
     api_key: env.SMTP2GO_API_KEY,
     to: [to],
     sender: `${senderName} <${senderEmail}>`,
@@ -111,6 +114,7 @@ async function sendEmail(env: Env, to: string, subject: string, html: string, te
     html_body: html,
     text_body: text,
   };
+  if (attachments && attachments.length) payload.attachments = attachments;
   const res = await fetch("https://api.smtp2go.com/v3/email/send", {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -207,16 +211,30 @@ async function emailVerifyConfirm(request: Request, env: Env): Promise<Response>
     return j({ ok: false, error: `Wrong code. ${remaining} attempt${remaining === 1 ? "" : "s"} left.` }, 401);
   }
 
-  // Match — send the detailed report and consume the code
+  // Match — generate PDF, send colorful summary email with PDF attached, consume the code
   const report = record.report;
-  const html = renderEmailHtml(report);
+  let pdfAttachment: Attachment | undefined;
+  try {
+    const pdfBytes = await buildReportPdf(report);
+    pdfAttachment = {
+      filename: `gb0-713-mock-report-${report.score}-of-${report.total}.pdf`,
+      fileblob: uint8ToBase64(pdfBytes),
+      mimetype: "application/pdf",
+    };
+  } catch (e: any) {
+    // PDF generation failure shouldn't block the email — log and continue with HTML-only
+    console.log("pdf gen failed:", e?.message || e);
+  }
+
+  const html = renderSummaryHtml(report, !!pdfAttachment);
   const text = renderEmailText(report);
   const send = await sendEmail(
     env,
     email,
-    `Your GB0-713 mock exam detailed report — ${report.score}/${report.total} (${report.pct}%)`,
+    `Your GB0-713 mock exam result — ${report.score}/${report.total} (${report.pct}%)`,
     html,
     text,
+    pdfAttachment ? [pdfAttachment] : undefined,
   );
   // delete regardless to prevent replay
   await env.STATS_KV.delete(vcKey(email));
@@ -258,69 +276,112 @@ function escapeHtml(s: string): string {
   );
 }
 
-function renderEmailHtml(r: any): string {
+function renderSummaryHtml(r: any, hasPdf: boolean): string {
   const sections = (r.perSection || []) as Array<{ section: string; correct: number; partial: number; incorrect: number; total: number; pct: number }>;
   const weak = (r.weakest || []) as Array<{ section: string; pct: number; advice: string }>;
-  const items = (r.items || []) as Array<{ idx: number; section: string; question: string; options: string[]; correctLetters: string[]; pickedLetters: string[]; status: string; explanation: string }>;
+  const passColor = r.passed ? "#1f9c5b" : "#d6443b";
+  const passBg = r.passed ? "linear-gradient(135deg,#1f9c5b,#16a463)" : "linear-gradient(135deg,#d6443b,#b8392f)";
+  const passLabel = r.passed ? "Pass" : "Below pass mark";
+  const passEmoji = r.passed ? "" : "";
+
+  const tally = (label: string, val: number, fg: string, bg: string) =>
+    `<td style="width:25%;padding:6px;"><div style="background:${bg};border-radius:8px;padding:14px 10px;text-align:center;border:1px solid ${fg}33;"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:${fg};font-weight:700;">${label}</div><div style="font-size:26px;font-weight:800;color:${fg};margin-top:4px;line-height:1;">${val}</div></div></td>`;
+
+  const sectionRow = (s: { section: string; correct: number; partial: number; incorrect: number; pct: number }) => {
+    const barColor = s.pct >= 80 ? "#1f9c5b" : s.pct < 60 ? "#d6443b" : "#f38020";
+    return `<tr>
+      <td style="padding:10px 12px;border-bottom:1px solid #e4e7eb;font-size:13px;color:#0f2549;">${escapeHtml(s.section)}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid #e4e7eb;font-size:12px;color:#1f9c5b;text-align:center;font-weight:700;">${s.correct}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid #e4e7eb;font-size:12px;color:#c98a16;text-align:center;font-weight:700;">${s.partial}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid #e4e7eb;font-size:12px;color:#d6443b;text-align:center;font-weight:700;">${s.incorrect}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid #e4e7eb;font-size:13px;color:#0f2549;text-align:right;font-weight:700;">${s.pct}%</td>
+      <td style="padding:10px 12px;border-bottom:1px solid #e4e7eb;width:120px;">
+        <div style="height:6px;background:#f6f7fb;border-radius:99px;overflow:hidden;"><div style="height:100%;width:${Math.min(100,s.pct)}%;background:${barColor};border-radius:inherit;"></div></div>
+      </td>
+    </tr>`;
+  };
+
+  const recCard = (w: { section: string; pct: number; advice: string }) => {
+    const barColor = w.pct < 50 ? "#d6443b" : "#c98a16";
+    return `<div style="background:#f6f7fb;border-left:4px solid ${barColor};border-radius:8px;padding:14px 16px;margin-bottom:10px;">
+      <div style="font-weight:700;font-size:14px;color:#0f2549;margin-bottom:4px;">${escapeHtml(w.section)} - ${w.pct}%</div>
+      <div style="font-size:13px;color:#5a6276;line-height:1.5;">${escapeHtml(w.advice)}</div>
+    </div>`;
+  };
 
   return `<!doctype html>
-<html><head><meta charset="utf-8"><title>GB0-713 detailed report</title></head>
-<body style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f4f5f7;margin:0;padding:24px;color:#1d2233;">
-<div style="max-width:680px;margin:0 auto;background:#fff;border-radius:12px;padding:32px;box-shadow:0 4px 24px rgba(15,20,38,.08);">
-  <div style="border-bottom:1px solid #e2e6ef;padding-bottom:16px;margin-bottom:24px;">
-    <div style="display:inline-block;background:linear-gradient(135deg,#F38020,#FAAD3F);color:#fff;font-weight:700;padding:6px 12px;border-radius:6px;font-size:12px;letter-spacing:.04em;">GB0-713 MOCK</div>
-    <h1 style="margin:12px 0 4px;font-size:24px;">Your detailed report</h1>
-    <p style="margin:0;color:#5a6276;font-size:14px;">H3CNE-Cloud · Deploy and Manage the H3C CAS Virtualization Platform</p>
+<html><head><meta charset="utf-8"><title>GB0-713 mock — your result</title></head>
+<body style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f4f5f7;margin:0;padding:24px;color:#0f2549;">
+<div style="max-width:640px;margin:0 auto;">
+
+  <!-- header / brand -->
+  <div style="background:linear-gradient(135deg,#F38020,#FAAD3F);border-radius:14px 14px 0 0;padding:22px 28px;color:#fff;">
+    <div style="display:inline-block;background:rgba(255,255,255,.18);padding:5px 12px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.1em;">GB0-713 MOCK</div>
+    <h1 style="margin:10px 0 2px;font-size:22px;font-weight:800;letter-spacing:-.01em;">Your result is in</h1>
+    <p style="margin:0;font-size:13px;opacity:.95;">H3CNE-Cloud - Deploy and Manage the H3C CAS Virtualization Platform</p>
   </div>
 
-  <div style="background:${r.passed ? "#e3f6ec" : "#fbe6e4"};border:1px solid ${r.passed ? "#94d4af" : "#e6a7a1"};color:${r.passed ? "#1f9c5b" : "#d6443b"};padding:18px 20px;border-radius:8px;margin-bottom:24px;">
-    <div style="font-size:36px;font-weight:700;line-height:1;">${r.score} <span style="color:#5a6276;font-size:18px;font-weight:500;">/ ${r.total}</span></div>
-    <div style="margin-top:6px;font-size:18px;">${r.pct}% — ${r.passed ? "Pass (≥60%)" : "Below pass mark (60%)"}</div>
-    <div style="margin-top:4px;font-size:13px;color:#5a6276;">Took ${r.tookFmt} · ${r.correctCount} correct · ${r.partialCount} partial · ${r.incorrectCount} incorrect · ${r.skippedCount} skipped</div>
+  <!-- score banner -->
+  <div style="background:${passBg};color:#fff;padding:24px 28px;border-radius:0;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+      <tr>
+        <td style="vertical-align:middle;">
+          <div style="font-size:54px;font-weight:800;line-height:1;letter-spacing:-.03em;">${r.score}<span style="color:rgba(255,255,255,.78);font-size:22px;font-weight:600;"> / ${r.total}</span></div>
+          <div style="margin-top:6px;font-size:13px;color:rgba(255,255,255,.92);">Took ${r.tookFmt}</div>
+        </td>
+        <td style="vertical-align:middle;text-align:right;">
+          <div style="display:inline-block;background:rgba(255,255,255,.22);padding:8px 18px;border-radius:99px;font-size:14px;font-weight:700;letter-spacing:.02em;">${passLabel} - ${r.pct}%</div>
+          <div style="margin-top:6px;font-size:11px;color:rgba(255,255,255,.78);">Pass mark: 60%</div>
+        </td>
+      </tr>
+    </table>
   </div>
 
-  <h2 style="font-size:18px;margin:24px 0 12px;">Recommendations</h2>
-  ${weak.length === 0
-    ? `<p style="color:#5a6276;">Strong across all sections — keep reviewing weak distractors to lock in.</p>`
-    : `<ul style="padding-left:20px;color:#1d2233;">${weak.map((w) => `<li style="margin-bottom:8px;"><strong>${escapeHtml(w.section)}</strong> (${w.pct}%) — ${escapeHtml(w.advice)}</li>`).join("")}</ul>`}
+  <!-- white card with tallies + breakdown + recs + footer -->
+  <div style="background:#fff;border-radius:0 0 14px 14px;padding:24px 28px 28px;box-shadow:0 4px 24px rgba(15,20,38,.08);">
 
-  <h2 style="font-size:18px;margin:24px 0 12px;">Section breakdown</h2>
-  <table style="width:100%;border-collapse:collapse;font-size:14px;">
-    <thead><tr style="text-align:left;color:#5a6276;font-size:12px;text-transform:uppercase;letter-spacing:.04em;">
-      <th style="padding:8px 12px;border-bottom:1px solid #e2e6ef;">Section</th>
-      <th style="padding:8px 12px;border-bottom:1px solid #e2e6ef;text-align:right;">Correct</th>
-      <th style="padding:8px 12px;border-bottom:1px solid #e2e6ef;text-align:right;">Partial</th>
-      <th style="padding:8px 12px;border-bottom:1px solid #e2e6ef;text-align:right;">Wrong</th>
-      <th style="padding:8px 12px;border-bottom:1px solid #e2e6ef;text-align:right;">%</th>
-    </tr></thead>
-    <tbody>
-    ${sections.map((s) => `<tr>
-      <td style="padding:10px 12px;border-bottom:1px solid #f0f2f8;">${escapeHtml(s.section)}</td>
-      <td style="padding:10px 12px;border-bottom:1px solid #f0f2f8;text-align:right;">${s.correct}</td>
-      <td style="padding:10px 12px;border-bottom:1px solid #f0f2f8;text-align:right;">${s.partial}</td>
-      <td style="padding:10px 12px;border-bottom:1px solid #f0f2f8;text-align:right;">${s.incorrect}</td>
-      <td style="padding:10px 12px;border-bottom:1px solid #f0f2f8;text-align:right;font-weight:600;">${s.pct}%</td>
-    </tr>`).join("")}
-    </tbody>
-  </table>
+    <!-- tallies -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;border-spacing:6px;margin-bottom:8px;">
+      <tr>
+        ${tally("Correct",   r.correctCount,   "#1f9c5b", "#e3f6ec")}
+        ${tally("Partial",   r.partialCount,   "#c98a16", "#fbf2dc")}
+        ${tally("Incorrect", r.incorrectCount, "#d6443b", "#fbe6e4")}
+        ${tally("Skipped",   r.skippedCount,   "#5a6276", "#f6f7fb")}
+      </tr>
+    </table>
 
-  <h2 style="font-size:18px;margin:24px 0 12px;">Question-by-question review</h2>
-  ${items.map((it) => {
-    const statusColor = it.status === "correct" ? "#1f9c5b" : it.status === "partial" ? "#c98a16" : it.status === "incorrect" ? "#d6443b" : "#5a6276";
-    const statusBg = it.status === "correct" ? "#e3f6ec" : it.status === "partial" ? "#fbf2dc" : it.status === "incorrect" ? "#fbe6e4" : "#f0f2f8";
-    return `<div style="border:1px solid #e2e6ef;border-radius:8px;padding:16px 18px;margin-bottom:12px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;color:#5a6276;">
-        <span style="text-transform:uppercase;letter-spacing:.04em;font-weight:600;">${it.idx}. ${escapeHtml(it.section)}</span>
-        <span style="background:${statusBg};color:${statusColor};padding:3px 8px;border-radius:4px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;">${escapeHtml(it.status)}</span>
-      </div>
-      <div style="font-size:15px;margin-bottom:10px;">${escapeHtml(it.question)}</div>
-      <div style="font-size:13px;color:#5a6276;margin-bottom:6px;">Correct: <strong style="color:#1d2233;">${escapeHtml(it.correctLetters.join(", "))}</strong> · You picked: <strong style="color:#1d2233;">${escapeHtml(it.pickedLetters.join(", ") || "—")}</strong></div>
-      <div style="background:#f6f7fb;border-left:3px solid #F38020;padding:10px 12px;font-size:13px;color:#5a6276;border-radius:4px;">${escapeHtml(it.explanation)}</div>
-    </div>`;
-  }).join("")}
+    <!-- attachment notice -->
+    ${hasPdf ? `<div style="margin-top:18px;padding:14px 16px;background:#fff7ec;border:1px solid #f3b070;border-radius:10px;display:flex;align-items:center;gap:12px;">
+      <div style="background:#F38020;color:#fff;font-weight:700;font-size:11px;padding:5px 9px;border-radius:6px;letter-spacing:.05em;">PDF</div>
+      <div style="font-size:13px;color:#0f2549;"><strong>Detailed report attached.</strong> Open the PDF for the full question-by-question review with correct answers and explanations.</div>
+    </div>` : ""}
 
-  <div style="margin-top:32px;padding-top:16px;border-top:1px solid #e2e6ef;color:#5a6276;font-size:12px;">
-    Independent study tool · Not affiliated with or endorsed by H3C. Reply is not monitored.
+    <!-- section breakdown -->
+    <h2 style="font-size:15px;margin:24px 0 10px;color:#0f2549;letter-spacing:-.01em;">Section breakdown</h2>
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:13px;">
+      <thead><tr style="text-align:left;color:#8b91a0;font-size:10px;text-transform:uppercase;letter-spacing:.07em;">
+        <th style="padding:8px 12px;border-bottom:1px solid #e4e7eb;font-weight:700;">Section</th>
+        <th style="padding:8px 12px;border-bottom:1px solid #e4e7eb;text-align:center;font-weight:700;">OK</th>
+        <th style="padding:8px 12px;border-bottom:1px solid #e4e7eb;text-align:center;font-weight:700;">1/2</th>
+        <th style="padding:8px 12px;border-bottom:1px solid #e4e7eb;text-align:center;font-weight:700;">X</th>
+        <th style="padding:8px 12px;border-bottom:1px solid #e4e7eb;text-align:right;font-weight:700;">%</th>
+        <th style="padding:8px 12px;border-bottom:1px solid #e4e7eb;font-weight:700;"></th>
+      </tr></thead>
+      <tbody>
+        ${sections.map(sectionRow).join("")}
+      </tbody>
+    </table>
+
+    <!-- recommendations -->
+    <h2 style="font-size:15px;margin:24px 0 10px;color:#0f2549;letter-spacing:-.01em;">${weak.length === 0 ? "Recommendations" : "Focus areas before retaking"}</h2>
+    ${weak.length === 0
+      ? `<div style="background:#e3f6ec;border-left:4px solid #1f9c5b;border-radius:8px;padding:14px 16px;font-size:13px;color:#0f2549;"><strong>Strong across every module.</strong> Run another shuffled mock to verify consistency.</div>`
+      : weak.map(recCard).join("")}
+
+    <!-- footer -->
+    <div style="margin-top:24px;padding-top:14px;border-top:1px solid #e4e7eb;color:#8b91a0;font-size:11px;text-align:center;">
+      Independent study tool - not affiliated with or endorsed by H3C. Reply is not monitored.
+    </div>
   </div>
 </div>
 </body></html>`;
