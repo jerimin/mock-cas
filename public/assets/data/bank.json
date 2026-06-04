@@ -1138,7 +1138,7 @@
     "format": "multi",
     "question": "Among the following, which are the canonical minimal-configuration disk counts for each RAID level?",
     "options": [
-      "RAID 0: minimum 1 disk.",
+      "RAID 0: minimum 2 disks (striping needs at least two).",
       "RAID 1: minimum 2 disks.",
       "RAID 5: minimum 3 disks.",
       "RAID 6: minimum 4 disks.",
@@ -1151,7 +1151,7 @@
       3,
       4
     ],
-    "explanation": "The canonical minimal configurations are 1, 2, 4, 3, 4 for RAID 0, 1, 10, 5, 6 respectively. All five options match these values exactly."
+    "explanation": "The minimal configurations are 2, 2, 3, 4, 4 disks for RAID 0, 1, 5, 6, 10 respectively. RAID 0 striping needs at least two disks; RAID 1 mirrors two; RAID 5 needs three; RAID 6 needs four; RAID 10 needs four."
   },
   {
     "id": "infra-43",
