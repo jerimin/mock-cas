@@ -704,6 +704,54 @@
 
     $("#newBtn").addEventListener("click", () => { clearState(); renderSetup(); });
     $("#exitBtn").addEventListener("click", () => { clearState(); window.location.href = "/"; });
+
+    showSponsoredAd();
+  };
+
+  // ---- 10-sec Cloud Digit sponsored toast (animated, soundless) ------------
+  const AD_DISMISS_KEY = "mock-cas-ad-dismissed-until";
+  const AD_DURATION_MS = 10_000;
+
+  const showSponsoredAd = () => {
+    try {
+      const until = parseInt(localStorage.getItem(AD_DISMISS_KEY) || "0", 10);
+      if (until > Date.now()) return; // user dismissed within last 24h, honour it
+    } catch { /* localStorage off — show anyway */ }
+
+    if (document.querySelector(".ad-toast")) return; // never double-render
+
+    const ad = document.createElement("aside");
+    ad.className = "ad-toast";
+    ad.setAttribute("aria-label", "Sponsored message");
+    ad.innerHTML = `
+      <div class="ad-mesh" aria-hidden="true"></div>
+      <button class="ad-close" type="button" aria-label="Dismiss sponsored message" title="Dismiss">&times;</button>
+      <div class="ad-content">
+        <div class="ad-tag">SPONSORED</div>
+        <div class="ad-brand">
+          <span class="ad-brand-mark" aria-hidden="true">CD</span>
+          <span class="ad-brand-name">Cloud Digit</span>
+        </div>
+        <p class="ad-lede">Bangladesh's cloud platform &mdash; from IaaS to managed services.</p>
+        <a class="ad-cta" href="https://clouddigit.ai" target="_blank" rel="noopener noreferrer">Visit clouddigit.ai &rarr;</a>
+      </div>
+      <div class="ad-progress" aria-hidden="true"></div>
+    `;
+    document.body.appendChild(ad);
+
+    let closed = false;
+    const close = (dismissed) => {
+      if (closed) return;
+      closed = true;
+      ad.classList.add("ad-leaving");
+      if (dismissed) {
+        try { localStorage.setItem(AD_DISMISS_KEY, String(Date.now() + 24 * 60 * 60 * 1000)); } catch {}
+      }
+      setTimeout(() => ad.remove(), 500);
+    };
+
+    ad.querySelector(".ad-close").addEventListener("click", () => close(true));
+    setTimeout(() => close(false), AD_DURATION_MS);
   };
 
   const maskEmail = (e) => {

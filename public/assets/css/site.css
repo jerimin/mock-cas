@@ -915,6 +915,130 @@ main {
 
 .hidden { display: none !important; }
 
+/* ---------- Sponsored toast (Cloud Digit) ---------- */
+.ad-toast {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 320px;
+  max-width: calc(100vw - 32px);
+  background: #0f1f35;
+  color: #f4f5f7;
+  border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  z-index: 200;
+  font-family: var(--font);
+  animation: ad-slide-in 0.45s cubic-bezier(0.2, 0.85, 0.2, 1) both;
+  isolation: isolate;
+}
+.ad-toast.ad-leaving { animation: ad-slide-out 0.5s ease-in both; }
+@keyframes ad-slide-in {
+  from { transform: translateX(120%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+@keyframes ad-slide-out {
+  from { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(120%); opacity: 0; }
+}
+.ad-mesh {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(243, 128, 32, 0.35) 0%, transparent 45%),
+    radial-gradient(circle at 80% 80%, rgba(89, 156, 232, 0.22) 0%, transparent 45%);
+  filter: blur(8px);
+  pointer-events: none;
+  z-index: -1;
+  animation: ad-mesh-drift 7s ease-in-out infinite alternate;
+}
+@keyframes ad-mesh-drift {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(-8px, -6px, 0) scale(1.08); }
+}
+.ad-content { position: relative; z-index: 1; }
+.ad-tag {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 8px;
+}
+.ad-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.ad-brand-mark {
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #f38020, #faad3f);
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(243, 128, 32, 0.4);
+}
+.ad-brand-name { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: -0.01em; }
+.ad-lede {
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.78);
+  margin: 0 0 10px;
+}
+.ad-cta {
+  display: inline-block;
+  color: #faad3f;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.ad-cta:hover { color: #ffbf61; text-decoration: underline; }
+.ad-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
+  background: transparent;
+  border: 0;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 6px;
+  z-index: 2;
+}
+.ad-close:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
+.ad-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(90deg, #f38020, #faad3f);
+  transform-origin: left center;
+  animation: ad-countdown 10s linear forwards;
+}
+@keyframes ad-countdown {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}
+@media (max-width: 600px) {
+  .ad-toast { right: 12px; bottom: 12px; left: 12px; width: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ad-toast, .ad-toast.ad-leaving { animation: none; }
+  .ad-mesh { animation: none; }
+  .ad-progress { animation: none; opacity: 0; }
+}
+
 .toolbar {
   display: flex;
   flex-wrap: wrap;
