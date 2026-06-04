@@ -1,6 +1,6 @@
 {
   "name": "mock-cas",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Timed mock exam for GB0-713 (H3CNE-Cloud) — 250-question bank, partial credit, verified email + PDF report. Cloudflare Workers Static Assets at mock.mymine.space.",
   "type": "module",
