@@ -3,6 +3,7 @@ import {
   validateQuestion,
   validateBank,
   findDuplicateStems,
+  findNearDuplicateStems,
   SEVERITY,
   VALID_FORMATS,
 } from "../public/assets/js/lib/schema.js";
@@ -145,6 +146,41 @@ describe("findDuplicateStems — regression: deploy-27 dup of deploy-12", () => 
   it("non-duplicate stems pass", () => {
     const dups = findDuplicateStems([goodSingle(), goodMulti(), goodNegative()]);
     expect(dups).toEqual([]);
+  });
+});
+
+describe("findNearDuplicateStems — redundant topic detection", () => {
+  it("flags two questions on the same topic with shared options (advanced-12/48 case)", () => {
+    const bank = [
+      { id: "x-12", section: "Advanced Functions", format: "multi", question: "Which of the following are prerequisites of the DPM policy in H3C CAS?",
+        options: ["All hosts use the same shared storage", "VMs use the same shared storage", "VMs enable Auto Migration", "Hosts enable Wakeup"], correctIndices: [0,1,2,3], explanation: "..." },
+      { id: "x-48", section: "Advanced Functions", format: "negative", question: "Regarding the H3C CAS DPM policy prerequisites, which of the following is incorrect?",
+        options: ["All hosts use the same shared storage", "VMs use the same shared storage", "VMs enable Auto Migration", "Hosts enable Wakeup", "All VMs need SR-IOV passthrough"], correctIndices: [4], explanation: "..." },
+    ];
+    const pairs = findNearDuplicateStems(bank);
+    expect(pairs.length).toBeGreaterThanOrEqual(1);
+    expect(pairs[0].a).toBe("x-12");
+    expect(pairs[0].b).toBe("x-48");
+  });
+  it("does NOT flag two genuinely different questions", () => {
+    const bank = [
+      { id: "a", section: "Maintenance", format: "single", question: "Which command prints the OVS version on a CVK host?",
+        options: ["ovs-vsctl -V","ovs-appctl bond/show","virsh list","cha cluster-list"], correctIndices: [0], explanation: "..." },
+      { id: "b", section: "Maintenance", format: "single", question: "Which log path records OCFS2 fence-triggered host restarts?",
+        options: ["/var/log/ocfs_fence_restart.log","/var/log/messages","/var/log/operation","/var/log/libvirt/qemu"], correctIndices: [0], explanation: "..." },
+    ];
+    expect(findNearDuplicateStems(bank)).toEqual([]);
+  });
+  it("validateBank surfaces near-dups as WARN, not ERROR", () => {
+    const bank = [
+      { id: "x-12", section: "Advanced Functions", format: "multi", question: "Which of the following are prerequisites of the DPM policy in H3C CAS?",
+        options: ["a","b","c","d"], correctIndices: [0,1,2,3], explanation: "explanation long enough to pass" },
+      { id: "x-48", section: "Advanced Functions", format: "negative", question: "Regarding the H3C CAS DPM policy prerequisites, which of the following is incorrect?",
+        options: ["a","b","c","d","e"], correctIndices: [4], explanation: "explanation long enough to pass" },
+    ];
+    const { errors, warnings } = validateBank(bank);
+    expect(errors.some((e) => /near-duplicate/.test(e.message))).toBe(false);
+    expect(warnings.some((w) => /near-duplicate/.test(w.message))).toBe(true);
   });
 });
 

@@ -2291,19 +2291,19 @@
     "id": "basic-21",
     "section": "Basic Functions",
     "format": "negative",
-    "question": "Among the following descriptions of CAS disk encryption, which are incorrect? (Select two)",
+    "question": "Regarding the VM snapshot function, snapshot policy, and snapshot management in CAS, which of the following descriptions are incorrect? (Select two)",
     "options": [
-      "Disk encryption uses the XTS-AES-256 symmetric algorithm at the kernel level",
-      "It supports VM hot encryption, and the data key is obtained from the kernel for decryption when starting",
-      "It supports the VM in the disk file format (qcow2) as well as RAW block device format",
-      "It supports file-level encryption inside the guest operating system",
-      "When the VM is migrated within the cluster, key information and files are migrated synchronously"
+      "A VM snapshot saves the state of the VM at a specific moment, similar to taking a photo",
+      "A snapshot is an independent complete copy of all VM data and can serve as a permanent replacement for the VM backup function",
+      "The snapshot function is mainly used before high-risk operations such as system patching, upgrades, and destructive software testing, and is used for rapid recovery of a VM failure",
+      "The snapshot policy places no upper limit on the number of snapshots that can be created for a VM",
+      "Snapshot management supports snapshot creation, restoration, and deletion"
     ],
     "correctIndices": [
-      2,
+      1,
       3
     ],
-    "explanation": "CAS disk encryption does not support the VM in the disk file format (qcow2) and does not support file-level encryption in the operating system. Both C and D contradict these rules."
+    "explanation": "A snapshot only records the point-in-time state of the VM for rapid rollback and is not an independent full copy of the data, so it cannot replace the VM backup function, which is a separate data-protection mechanism. The snapshot policy defines the maximum number of snapshots that can be created for a VM, so the number is limited rather than unlimited. Therefore options B and D are incorrect. A snapshot is a point-in-time capture of the VM state, it is used before high-risk operations for rapid recovery, and snapshot management supports creation, restoration, and deletion."
   },
   {
     "id": "basic-22",
@@ -2693,33 +2693,33 @@
     "id": "basic-44",
     "section": "Basic Functions",
     "format": "negative",
-    "question": "Regarding the differential backup type in CAS, which of the following descriptions is incorrect?",
+    "question": "Regarding network QoS in CAS, which of the following descriptions is incorrect?",
     "options": [
-      "The recovery time is short, and it does not rely on intermediate backup data",
-      "Duplicate data exists, and the size of the backup file will continue to increase over time",
-      "It is based on the full backup and only backs up data that has changed since the last full backup",
-      "It only backs up data that has changed since the last backup (full or incremental), so there is no duplicate data"
+      "Network I/O rate control is implemented by applying a network policy template to the VM",
+      "It supports inbound and outbound traffic limit, and implements the speed limit function on the vSwitch port",
+      "When the bandwidth of the physical NIC is congested, it ensures that as many network I/O resources as possible are allocated to high-priority key services",
+      "It supports limiting the IOPS of the VM, including separate limiting read and limiting write controls"
     ],
     "correctIndices": [
       3
     ],
-    "explanation": "Option D describes incremental backup. Differential backup is based on the full backup and copies data changed since the last full backup, so duplicate data exists and the backup file size will increase over time."
+    "explanation": "Network QoS controls the network I/O rate by applying a network policy template to the VM, limits inbound and outbound traffic with a speed limit on the vSwitch port, and protects high-priority key services when the physical NIC is congested. Limiting IOPS (with separate read and write controls) belongs to storage QoS, not network QoS, so option D is incorrect."
   },
   {
     "id": "basic-45",
     "section": "Basic Functions",
     "format": "negative",
-    "question": "Regarding CAS virtual disk encryption, which of the following descriptions is incorrect?",
+    "question": "Regarding the scope of VM migration in CAS, which of the following descriptions is incorrect?",
     "options": [
-      "Kernel-level disk encryption uses the XTS-AES-256 symmetric algorithm and is unrelated to the type of VM operating system",
-      "Disk encryption can cause significant VM performance loss and user services will feel obvious read/write delay",
-      "Disk encryption supports VM hot encryption, and the data key is obtained from the kernel for decryption when starting",
-      "When the VM is migrated within the cluster, key information and files are migrated synchronously"
+      "Host change means migrating the VM to another host",
+      "Storage change means migrating the VM image files to another storage",
+      "Host change and storage change together mean migrating the VM to another host and also migrating the VM image files to another storage",
+      "Migration can only change the host, and the VM image files can never be moved to a different storage"
     ],
     "correctIndices": [
-      1
+      3
     ],
-    "explanation": "Disk encryption causes no loss to VM performance, and user services have no sense of whether the disk is encrypted. Option B reverses this fact."
+    "explanation": "VM migration includes host change (move the VM to another host), storage change (move the VM image files to another storage), and host change plus storage change (both at once). Migration is therefore not limited to changing the host only, so option D is incorrect."
   },
   {
     "id": "basic-46",
@@ -2775,19 +2775,19 @@
     "id": "basic-49",
     "section": "Basic Functions",
     "format": "negative",
-    "question": "Regarding the three CPU working modes in CAS, which of the following statements are incorrect? (Select two)",
+    "question": "Regarding the configurable items in the Modify VM dialog box for VM settings in CAS, which of the following statements are incorrect? (Select two)",
     "options": [
-      "Compatibility mode uses QEMU64 and is the recommended mode",
-      "Host matching mode delivers performance close to the host CPU but is poorer in migration compatibility than Compatibility mode",
-      "Straight-through mode transparently transmits the host CPU model to the VM, has optimal performance, and has perfect migration compatibility even across different CPU generations of the same manufacturer",
-      "Compatibility mode provides hardware-level features such as aes encryption acceleration to the VM",
-      "In Straight-through mode, different generations of CPUs from the same manufacturer may not be able to migrate"
+      "I/O priority: when disk read and write preemption occurs, the VM with high I/O priority has the priority for read and write operations",
+      "Automatic migration of VMs is triggered manually by the operator and cannot be triggered automatically by any scheduling mechanism",
+      "Time synchronization: synchronize the system time of the CVK host",
+      "Blue screen failure policy: used to handle the situation when the CVK host encounters a blue screen",
+      "CAStools automatic upgrade: automatically upgrade the CAStools version"
     ],
     "correctIndices": [
-      2,
+      1,
       3
     ],
-    "explanation": "Straight-through mode has very poor migration compatibility and different generations of CPUs from the same manufacturer may not be able to migrate (C is wrong), and Compatibility mode cannot provide optimal performance such as aes encryption (D is wrong)."
+    "explanation": "Automatic migration of VMs is triggered automatically by the DPM and the DRS, not only manually by the operator, so option B is incorrect. The blue screen failure policy is used when the VM has a blue screen, not when the CVK host has a blue screen, so option D is incorrect. I/O priority, time synchronization with the CVK host, and CAStools automatic upgrade are all valid VM settings."
   },
   {
     "id": "basic-50",
@@ -3555,17 +3555,17 @@
     "id": "advanced-44",
     "section": "Advanced Functions",
     "format": "negative",
-    "question": "Regarding the H3C CAS host wakeup methods used by DPM, which of the following is incorrect?",
+    "question": "Regarding the H3C CAS VM blue-screen HA, which of the following statements is incorrect?",
     "options": [
-      "Network wakeup requires enabling the Network Wakeup function in the BIOS of the host (for example, set Wake-On LAN to Enabled on an H3C server)",
-      "IPMI wakeup means IPMI sends a command to the BMC on the host to be woken up",
-      "Network wakeup and IPMI wakeup are the two host wakeup methods supported",
-      "Serial console BREAK signaling and PXE remote boot are the standard DPM wakeup methods on H3C CAS"
+      "The Windows operating system blue screen is displayed when there is a catastrophic error or the internal conditions prevent the system from continuing to run, generally caused by incompatible software and hardware drivers",
+      "When panic occurs in the kernel of the Linux operating system, the Linux operating system has a phenomenon similar to the blue screen of the Windows operating system",
+      "After the operating system of the VM has a blue screen, the administrator can determine an automatic processing policy of do not process, restart the VM, or migrate the VM",
+      "After detecting a blue screen, the platform always automatically migrates the affected VM to another host, and this behavior cannot be configured"
     ],
     "correctIndices": [
       3
     ],
-    "explanation": "DPM supports only two host wakeup methods: Network wakeup and IPMI wakeup. Serial console BREAK and PXE remote boot are not supported."
+    "explanation": "After a VM blue screen, the administrator selects an automatic processing policy among do not process, restart the VM, or migrate the VM. The behavior is configurable, so it is wrong to claim the platform always automatically migrates the VM with no configurable option."
   },
   {
     "id": "advanced-45",
@@ -3621,18 +3621,19 @@
     "id": "advanced-48",
     "section": "Advanced Functions",
     "format": "negative",
-    "question": "Regarding the H3C CAS DPM policy prerequisites, which of the following is incorrect?",
+    "question": "Regarding the H3C CAS Application HA service detection mechanism, which of the following statements are incorrect? (Select two)",
     "options": [
-      "All hosts in the cluster must use the same shared storage",
-      "VMs in the cluster must use the same shared storage",
-      "VMs in the cluster must enable the Auto Migration function",
-      "Hosts in the cluster must enable the Wakeup function",
-      "All VMs in the cluster must have SR-IOV VF passthrough enabled so DPM can preserve network performance after migration"
+      "Application HA provides high availability for a service system running in the operating system of the VM, and when the service cannot provide services normally due to its own reasons it automatically restores the service in the shortest time",
+      "The virtualization management platform uses the CAStools to monitor the status of the service progress",
+      "Application HA monitors the survival of the service by sending a network heartbeat from the VM to the CVM management process over the management network",
+      "After repeated failed restart attempts, the VM is restarted based on the configured policy or the application is reported as unrecoverable",
+      "When the service fails the first time, Application HA immediately migrates the VM to another host without attempting any local service restart"
     ],
     "correctIndices": [
+      2,
       4
     ],
-    "explanation": "DPM has exactly four prerequisites: same shared storage on hosts, same shared storage on VMs, Auto Migration on VMs, and Wakeup on hosts. SR-IOV VF passthrough is not a DPM prerequisite."
+    "explanation": "Application HA determines the survival status of the service through the virtual serial port channel between CAStools and the management platform, not through a network heartbeat over the management network, so option 3 is wrong. Application HA first repeatedly attempts to restart the service, and only after several failed attempts does it restart the VM based on the configured policy or report the application as unrecoverable; it does not immediately migrate the VM on the first failure, so option 5 is wrong."
   },
   {
     "id": "advanced-49",
@@ -3691,10 +3692,10 @@
     "format": "single",
     "question": "Which command is used to display the overall vSwitch configuration and its port topology on a CVK host?",
     "options": [
-      "Ovs-vsctl -V",
-      "Ovs-appctl bond/show",
-      "Ovs-vsctl show",
-      "Ovs-vsctl list-ports"
+      "ovs-vsctl -V",
+      "ovs-appctl bond/show",
+      "ovs-vsctl show",
+      "ovs-vsctl list-ports"
     ],
     "correctIndices": [
       2
@@ -3723,10 +3724,10 @@
     "format": "single",
     "question": "Which command is used to query vSwitch port-bond (LAG) status and member-port details on a CVK host?",
     "options": [
-      "Ovs-vsctl bond-show",
-      "Ovs-appctl bond/show",
-      "Ovs-vsctl show bond",
-      "Ovs-appctl port/bond"
+      "ovs-vsctl bond-show",
+      "ovs-appctl bond/show",
+      "ovs-vsctl show bond",
+      "ovs-appctl port/bond"
     ],
     "correctIndices": [
       1
@@ -4005,7 +4006,7 @@
       "virsh pool-status",
       "virsh pool-list --all",
       "virsh storage-list",
-      "Ovs-vsctl pool-show"
+      "ovs-vsctl pool-show"
     ],
     "correctIndices": [
       1

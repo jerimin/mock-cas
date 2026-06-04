@@ -138,6 +138,65 @@ export function findDuplicateStems(bank) {
   return dups;
 }
 
+// Token-Jaccard near-duplicate detection — catches questions that re-test the
+// same narrow topic even when the wording differs (e.g. a "which is correct"
+// and a "which is incorrect" on the identical concept + option set).
+const STEM_STOPWORDS = new Set(
+  ("a an the of to in on for and or is are be as by with at from this that which following correct " +
+   "incorrect statements statement about regarding among descriptions description option options select two")
+    .split(" ")
+);
+
+function stemTokens(s) {
+  return (String(s).toLowerCase().match(/[a-z0-9]+/g) || []).filter(
+    (w) => w.length > 2 && !STEM_STOPWORDS.has(w)
+  );
+}
+
+function jaccard(a, b) {
+  const sa = new Set(a);
+  const sb = new Set(b);
+  if (sa.size === 0 || sb.size === 0) return 0;
+  let inter = 0;
+  for (const x of sa) if (sb.has(x)) inter++;
+  return inter / (sa.size + sb.size - inter);
+}
+
+/**
+ * Returns pairs whose stem token-Jaccard >= threshold OR whose option sets
+ * overlap heavily. These are likely-redundant questions even if not byte-identical.
+ *
+ * @param {Array<object>} bank
+ * @param {object} [opts]
+ * @param {number} [opts.stemThreshold=0.82]
+ * @param {number} [opts.optOverlap=0.6]
+ */
+export function findNearDuplicateStems(bank, opts = {}) {
+  const stemThreshold = opts.stemThreshold ?? 0.82;
+  const optOverlap = opts.optOverlap ?? 0.6;
+  const pre = bank.map((q) => ({
+    id: q.id,
+    tokens: stemTokens(q.question || ""),
+    opts: new Set((q.options || []).map((o) => String(o).toLowerCase().trim())),
+  }));
+  const pairs = [];
+  for (let i = 0; i < pre.length; i++) {
+    for (let j = i + 1; j < pre.length; j++) {
+      const js = jaccard(pre[i].tokens, pre[j].tokens);
+      let ov = 0;
+      if (pre[i].opts.size && pre[j].opts.size) {
+        let inter = 0;
+        for (const o of pre[i].opts) if (pre[j].opts.has(o)) inter++;
+        ov = inter / Math.min(pre[i].opts.size, pre[j].opts.size);
+      }
+      if (js >= stemThreshold || ov >= optOverlap) {
+        pairs.push({ a: pre[i].id, b: pre[j].id, stemJaccard: Math.round(js * 100) / 100, optOverlap: Math.round(ov * 100) / 100 });
+      }
+    }
+  }
+  return pairs;
+}
+
 /** Per-section count matches WEIGHTS proportions (within tolerance). */
 export function checkSectionBalance(bank, opts = {}) {
   const tolerance = opts.tolerance ?? 0.04;
@@ -266,9 +325,14 @@ export function validateBank(bank, opts = {}) {
     push({ id, severity: SEVERITY.ERROR, message: "duplicate id" });
   }
 
-  // Duplicate stems
+  // Duplicate stems (exact)
   for (const d of findDuplicateStems(bank)) {
     push({ id: d.id, severity: SEVERITY.ERROR, message: `duplicate stem of ${d.dupOf}` });
+  }
+
+  // Near-duplicate stems / option-sets (redundant topic coverage)
+  for (const p of findNearDuplicateStems(bank, opts.nearDup)) {
+    push({ id: p.a, severity: SEVERITY.WARN, message: `near-duplicate of ${p.b} (stem ${p.stemJaccard}, options ${p.optOverlap}) — verify they don't test the same narrow topic` });
   }
 
   // Balance
