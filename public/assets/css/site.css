@@ -736,6 +736,71 @@ main {
 .breakdown .bar.weak > span { background: var(--danger); }
 .breakdown .bar.strong > span { background: var(--success); }
 
+.behaviour-card .b-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 4px;
+  margin-bottom: 12px;
+}
+@media (max-width: 600px) {
+  .behaviour-card .b-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.behaviour-card .b-stat {
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.behaviour-card .b-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-subtle);
+  font-weight: 700;
+}
+.behaviour-card .b-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-strong);
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+.behaviour-card .b-value .b-of {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+.behaviour-card .b-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+.behaviour-card .b-insight {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.behaviour-card .b-insight .b-tag {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: var(--radius-pill);
+  margin-right: 6px;
+  margin-bottom: 4px;
+}
+.behaviour-card .b-insight ul { margin: 4px 0 0 16px; padding: 0; line-height: 1.45; }
+.behaviour-card .b-insight li { margin-bottom: 2px; }
+.behaviour-card .b-weak { background: var(--danger-soft); }
+.behaviour-card .b-weak .b-tag { background: var(--danger); color: #fff; }
+.behaviour-card .b-rushed { background: var(--warning-soft); }
+.behaviour-card .b-rushed .b-tag { background: var(--warning); color: #fff; }
+.behaviour-card .b-strong { background: var(--success-soft); }
+.behaviour-card .b-strong .b-tag { background: var(--success); color: #fff; }
+
 .recs { display: grid; gap: 6px; margin-top: 6px; }
 .rec {
   padding: 8px 12px;

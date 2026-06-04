@@ -279,10 +279,26 @@ function escapeHtml(s: string): string {
 function renderSummaryHtml(r: any, hasPdf: boolean): string {
   const sections = (r.perSection || []) as Array<{ section: string; correct: number; partial: number; incorrect: number; total: number; pct: number }>;
   const weak = (r.weakest || []) as Array<{ section: string; pct: number; advice: string }>;
+  const beh = r.behaviour || null;
   const passColor = r.passed ? "#1f9c5b" : "#d6443b";
   const passBg = r.passed ? "linear-gradient(135deg,#1f9c5b,#16a463)" : "linear-gradient(135deg,#d6443b,#b8392f)";
   const passLabel = r.passed ? "Pass" : "Below pass mark";
   const passEmoji = r.passed ? "" : "";
+
+  const fmtMMSS = (sec: number) => {
+    const s = Math.max(0, Math.floor(sec));
+    const m = Math.floor(s / 60), ss = s % 60;
+    return `${m}:${String(ss).padStart(2, "0")}`;
+  };
+
+  const behStat = (label: string, value: string, sub: string) =>
+    `<td style="width:25%;padding:5px;"><div style="background:#f6f7fb;border:1px solid #e4e7eb;border-radius:8px;padding:10px 12px;text-align:left;"><div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#8b91a0;font-weight:700;">${label}</div><div style="font-size:17px;font-weight:800;color:#0f2549;margin-top:2px;line-height:1.15;font-variant-numeric:tabular-nums;">${value}</div><div style="font-size:11px;color:#5a6276;margin-top:1px;">${sub}</div></div></td>`;
+
+  const behInsight = (tag: string, fg: string, bg: string, items: any[]) => items.length === 0 ? "" :
+    `<div style="margin-top:6px;background:${bg};border-radius:6px;padding:8px 12px;font-size:12px;color:#5a6276;">
+      <span style="display:inline-block;background:${fg};color:#fff;font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 8px;border-radius:99px;margin-right:6px;">${escapeHtml(tag)}</span>
+      <ul style="margin:4px 0 0 18px;padding:0;line-height:1.5;">${items.map((s) => `<li>${escapeHtml(s.section)} - ${s.pct}%, ${s.avgQSec}s/Q</li>`).join("")}</ul>
+    </div>`;
 
   const tally = (label: string, val: number, fg: string, bg: string) =>
     `<td style="width:25%;padding:6px;"><div style="background:${bg};border-radius:8px;padding:14px 10px;text-align:center;border:1px solid ${fg}33;"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:${fg};font-weight:700;">${label}</div><div style="font-size:26px;font-weight:800;color:${fg};margin-top:4px;line-height:1;">${val}</div></div></td>`;
@@ -377,6 +393,23 @@ function renderSummaryHtml(r: any, hasPdf: boolean): string {
     ${weak.length === 0
       ? `<div style="background:#e3f6ec;border-left:4px solid #1f9c5b;border-radius:8px;padding:14px 16px;font-size:13px;color:#0f2549;"><strong>Strong across every module.</strong> Run another shuffled mock to verify consistency.</div>`
       : weak.map(recCard).join("")}
+
+    ${beh ? `
+    <!-- behaviour -->
+    <h2 style="font-size:15px;margin:24px 0 10px;color:#0f2549;letter-spacing:-.01em;">Behaviour analysis</h2>
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;border-spacing:5px;">
+      <tr>
+        ${behStat("Pace", escapeHtml(beh.pace), `${fmtMMSS(beh.totalSec)} of ${fmtMMSS(beh.budgetSec)} - ${beh.pctOfBudget}%`)}
+        ${behStat("Avg / Q", `${beh.avgQSec}s`, `Median ${beh.medianQSec}s`)}
+        ${behStat("Marked", `${beh.markedCorrect}<span style="color:#8b91a0;font-size:13px;font-weight:500;"> / ${beh.markedTotal}</span>`, "right vs flagged")}
+        ${behStat("Changes", String(beh.totalChanges), `${beh.questionsChanged} Qs revised`)}
+      </tr>
+    </table>
+    ${behInsight("Struggled most", "#d6443b", "#fbe6e4", beh.struggleAreas || [])}
+    ${behInsight("Rushed through", "#c98a16", "#fbf2dc", beh.rushedSections || [])}
+    ${behInsight("Comfortable on", "#1f9c5b", "#e3f6ec", beh.comfortableAreas || [])}
+    <div style="margin-top:8px;font-size:12px;color:#5a6276;line-height:1.5;">${escapeHtml(beh.paceDetail || "")}</div>
+    ` : ""}
 
     <!-- footer -->
     <div style="margin-top:24px;padding-top:14px;border-top:1px solid #e4e7eb;color:#8b91a0;font-size:11px;text-align:center;">

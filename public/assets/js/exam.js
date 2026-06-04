@@ -5,7 +5,7 @@
    States: setup -> running -> review
 */
 (() => {
-  const STORAGE_KEY = "mock-cas-state-v3";
+  const STORAGE_KEY = "mock-cas-state-v4";
   const BANK_URL = "/assets/data/bank.json";
   const PASS_PCT = 60;
 
@@ -111,6 +111,16 @@
       return;
     }
     state = loadState();
+    // If resuming an in-progress attempt, reset qEnteredAt so closed-tab time isn't charged to the current question
+    if (state && !state.submittedAt) {
+      state.qEnteredAt = Date.now();
+      // back-fill timing fields if loading older state schema
+      state.qTime = state.qTime || {};
+      state.qVisits = state.qVisits || {};
+      state.qFirstSeenAt = state.qFirstSeenAt || {};
+      state.qChangeCount = state.qChangeCount || {};
+      saveState();
+    }
     route();
   };
 
@@ -197,10 +207,12 @@
     const order = pool.map((q) => q.id);
     const optionOrder = {};
     for (const q of pool) optionOrder[q.id] = shuffle(q.options.map((_, i) => i));
+    const now = Date.now();
+    const firstQid = order[0];
     state = {
       mode: modeKey,
       sectionFilter,
-      startedAt: Date.now(),
+      startedAt: now,
       durationSec: mode.durationSec,
       order,
       optionOrder,
@@ -208,9 +220,23 @@
       marked: {},
       currentIdx: 0,
       submittedAt: null,
+      // behaviour-analysis instrumentation
+      qTime: {},                    // qid -> cumulative ms on the question
+      qVisits: { [firstQid]: 1 },   // qid -> visit count
+      qFirstSeenAt: { [firstQid]: now },
+      qChangeCount: {},             // qid -> times the answer was changed
+      qEnteredAt: now,              // when current qid was entered (rolling)
     };
     saveState();
     renderRunning();
+  };
+
+  const flushQTime = () => {
+    if (!state || !state.qEnteredAt) return;
+    const qid = state.order[state.currentIdx];
+    const now = Date.now();
+    state.qTime[qid] = (state.qTime[qid] || 0) + (now - state.qEnteredAt);
+    state.qEnteredAt = now;
   };
 
   // ---- running --------------------------------------------------------------
@@ -341,7 +367,8 @@
       el.addEventListener("click", (e) => {
         e.preventDefault();
         const pos = Number(el.dataset.pos);
-        let sel = (state.answers[q.id] || []).slice();
+        const prev = state.answers[q.id] || [];
+        let sel = prev.slice();
         if (multi) {
           if (sel.includes(pos)) sel = sel.filter((p) => p !== pos);
           else sel.push(pos);
@@ -350,6 +377,10 @@
         }
         if (sel.length === 0) delete state.answers[q.id];
         else state.answers[q.id] = sel;
+        // count an "answer change" only when the new selection differs from previous
+        if (!setsEqual(prev, sel)) {
+          state.qChangeCount[q.id] = (state.qChangeCount[q.id] || 0) + 1;
+        }
         saveState();
         renderQuestion();
         renderGrid();
@@ -364,7 +395,13 @@
 
   const goTo = (idx) => {
     if (idx < 0 || idx >= state.order.length) return;
+    if (idx === state.currentIdx) return;
+    flushQTime();
     state.currentIdx = idx;
+    const qid = state.order[idx];
+    state.qVisits[qid] = (state.qVisits[qid] || 0) + 1;
+    if (!state.qFirstSeenAt[qid]) state.qFirstSeenAt[qid] = Date.now();
+    state.qEnteredAt = Date.now();
     saveState();
     renderQuestion();
     renderGrid();
@@ -399,6 +436,7 @@
   };
 
   const submitExam = (auto) => {
+    flushQTime();
     state.submittedAt = Date.now();
     state.autoSubmit = auto;
     saveState();
@@ -440,6 +478,106 @@
     return weakest;
   };
 
+  // ---- behaviour analysis ---------------------------------------------------
+  const computeBehaviour = (items, perSection) => {
+    const totalMs = state.submittedAt - state.startedAt;
+    const budgetMs = state.durationSec * 1000;
+    const pctOfBudget = Math.round((totalMs / budgetMs) * 100);
+    let pace, paceDetail;
+    if (state.autoSubmit) {
+      pace = "Ran out of time";
+      paceDetail = "Auto-submitted at the timer zero — consider pacing more aggressively next time.";
+    } else if (pctOfBudget < 50) {
+      pace = "Finished early";
+      paceDetail = "Used less than half the budget — verify you didn't rush on multi-answer questions.";
+    } else if (pctOfBudget < 80) {
+      pace = "Steady pace";
+      paceDetail = "Comfortable use of the time budget.";
+    } else {
+      pace = "Last-moment finish";
+      paceDetail = "Cut it close to the deadline — practise time management on the next attempt.";
+    }
+
+    const times = state.order.map((qid) => state.qTime[qid] || 0);
+    const totalQTime = times.reduce((a, b) => a + b, 0);
+    const avgMs = totalQTime / times.length;
+    const sorted = times.slice().sort((a, b) => a - b);
+    const medianMs = sorted[Math.floor(sorted.length / 2)] || 0;
+
+    const withTimes = items.map((it) => ({
+      qid: it.q.id,
+      section: it.q.section,
+      idx: it.i + 1,
+      ms: state.qTime[it.q.id] || 0,
+      status: it.status,
+    }));
+    const slowest = withTimes.slice().sort((a, b) => b.ms - a.ms).slice(0, 3);
+    const rushedWrong = withTimes
+      .filter((x) => (x.status === "incorrect" || x.status === "partial") && x.ms < avgMs * 0.5 && x.ms > 0)
+      .slice(0, 3);
+
+    // per-section time
+    const secTime = {};
+    for (const x of withTimes) {
+      if (!secTime[x.section]) secTime[x.section] = { totalMs: 0, count: 0 };
+      secTime[x.section].totalMs += x.ms;
+      secTime[x.section].count++;
+    }
+    const sectionTimings = Object.entries(secTime).map(([sec, t]) => ({
+      section: sec,
+      avgMs: t.count ? t.totalMs / t.count : 0,
+      pct: perSection[sec] ? Math.round((perSection[sec].score / perSection[sec].total) * 100) : 0,
+    }));
+
+    const struggleAreas = sectionTimings
+      .filter((s) => s.pct < 70 && s.avgMs > avgMs * 1.15)
+      .sort((a, b) => a.pct - b.pct)
+      .slice(0, 3);
+    const comfortableAreas = sectionTimings
+      .filter((s) => s.pct >= 80 && s.avgMs < avgMs)
+      .sort((a, b) => b.pct - a.pct)
+      .slice(0, 3);
+    const rushedSections = sectionTimings
+      .filter((s) => s.pct < 60 && s.avgMs < avgMs * 0.7)
+      .sort((a, b) => a.pct - b.pct)
+      .slice(0, 3);
+
+    // answer changes
+    const totalChanges = Object.values(state.qChangeCount || {}).reduce((a, b) => a + b, 0);
+    const questionsChanged = Object.values(state.qChangeCount || {}).filter((c) => c > 1).length;
+
+    // mark-for-review accuracy
+    const marked = Object.keys(state.marked || {});
+    const markedItems = items.filter((it) => marked.includes(it.q.id));
+    const markedCorrect = markedItems.filter((it) => it.status === "correct").length;
+    const markedNotCorrect = markedItems.length - markedCorrect;
+
+    // revisits
+    const revisitedCount = Object.values(state.qVisits || {}).filter((v) => v > 1).length;
+
+    return {
+      pace,
+      paceDetail,
+      totalSec: Math.round(totalMs / 1000),
+      budgetSec: state.durationSec,
+      pctOfBudget,
+      avgQSec: Math.round(avgMs / 1000),
+      medianQSec: Math.round(medianMs / 1000),
+      slowest: slowest.map((s) => ({ ...s, sec: Math.round(s.ms / 1000) })),
+      rushedWrong: rushedWrong.map((s) => ({ ...s, sec: Math.round(s.ms / 1000) })),
+      sectionTimings: sectionTimings.map((s) => ({ section: s.section, avgQSec: Math.round(s.avgMs / 1000), pct: s.pct })),
+      struggleAreas: struggleAreas.map((s) => ({ section: s.section, avgQSec: Math.round(s.avgMs / 1000), pct: s.pct })),
+      comfortableAreas: comfortableAreas.map((s) => ({ section: s.section, avgQSec: Math.round(s.avgMs / 1000), pct: s.pct })),
+      rushedSections: rushedSections.map((s) => ({ section: s.section, avgQSec: Math.round(s.avgMs / 1000), pct: s.pct })),
+      totalChanges,
+      questionsChanged,
+      markedTotal: marked.length,
+      markedCorrect,
+      markedNotCorrect,
+      revisitedCount,
+    };
+  };
+
   // ---- review ---------------------------------------------------------------
   const renderReview = () => {
     if (timerId) { clearInterval(timerId); timerId = null; }
@@ -469,6 +607,7 @@
     const passed = pct >= PASS_PCT;
     const elapsedSec = Math.round((state.submittedAt - state.startedAt) / 1000);
     const recs = buildRecommendations(perSection);
+    const beh = computeBehaviour(items, perSection);
 
     $("#app").innerHTML = `
       <div class="results-grid">
@@ -527,12 +666,39 @@
                 : recs.map((r) => `<div class="rec ${r.pct < 50 ? "weak" : "medium"}"><h4>${escapeHtml(r.section)} — ${r.pct}%</h4><p>${escapeHtml(r.advice)}</p></div>`).join("")}
             </div>
           </div>
+
+          <div class="card behaviour-card">
+            <h2>Behaviour analysis</h2>
+            <div class="b-grid">
+              <div class="b-stat"><div class="b-label">Pace</div><div class="b-value">${escapeHtml(beh.pace)}</div><div class="b-sub">${fmtTime(beh.totalSec)} of ${fmtTime(beh.budgetSec)} · ${beh.pctOfBudget}%</div></div>
+              <div class="b-stat"><div class="b-label">Avg / Q</div><div class="b-value">${beh.avgQSec}s</div><div class="b-sub">Median ${beh.medianQSec}s</div></div>
+              <div class="b-stat"><div class="b-label">Marked</div><div class="b-value">${beh.markedCorrect}<span class="b-of">/${beh.markedTotal}</span></div><div class="b-sub">right vs flagged</div></div>
+              <div class="b-stat"><div class="b-label">Changes</div><div class="b-value">${beh.totalChanges}</div><div class="b-sub">${beh.questionsChanged} Qs revised</div></div>
+            </div>
+            ${beh.struggleAreas.length > 0 ? `
+              <div class="b-insight b-weak">
+                <span class="b-tag">Struggled most</span>
+                <ul>${beh.struggleAreas.map((s) => `<li>${escapeHtml(s.section)} — ${s.pct}%, ${s.avgQSec}s/Q (vs ${beh.avgQSec}s avg)</li>`).join("")}</ul>
+              </div>` : ""}
+            ${beh.rushedSections.length > 0 ? `
+              <div class="b-insight b-rushed">
+                <span class="b-tag">Rushed through</span>
+                <ul>${beh.rushedSections.map((s) => `<li>${escapeHtml(s.section)} — ${s.pct}%, only ${s.avgQSec}s/Q (vs ${beh.avgQSec}s avg)</li>`).join("")}</ul>
+              </div>` : ""}
+            ${beh.comfortableAreas.length > 0 ? `
+              <div class="b-insight b-strong">
+                <span class="b-tag">Comfortable on</span>
+                <ul>${beh.comfortableAreas.map((s) => `<li>${escapeHtml(s.section)} — ${s.pct}%, ${s.avgQSec}s/Q</li>`).join("")}</ul>
+              </div>` : ""}
+            ${beh.struggleAreas.length === 0 && beh.rushedSections.length === 0 && beh.comfortableAreas.length === 0 ? `
+              <p class="muted" style="margin-top:8px;">${escapeHtml(beh.paceDetail)}</p>` : ""}
+          </div>
         </div>
       </div>
     `;
 
     // wire email verification flow
-    const reportPayload = buildReportPayload(items, perSection, tally, scoreSum, scoreRounded, total, pct, passed, elapsedSec, recs);
+    const reportPayload = buildReportPayload(items, perSection, tally, scoreSum, scoreRounded, total, pct, passed, elapsedSec, recs, beh);
     const emailFlow = { email: "", step: "init" };
     renderEmailStep("init", emailFlow, reportPayload);
 
@@ -643,7 +809,7 @@
     }
   };
 
-  const buildReportPayload = (items, perSection, tally, scoreSum, scoreRounded, total, pct, passed, elapsedSec, recs) => {
+  const buildReportPayload = (items, perSection, tally, scoreSum, scoreRounded, total, pct, passed, elapsedSec, recs, behaviour) => {
     const perSectionArr = Object.entries(perSection).map(([section, v]) => ({
       section,
       correct: v.correct,
@@ -676,6 +842,7 @@
       perSection: perSectionArr,
       weakest: recs,
       items: detailedItems,
+      behaviour,
     };
   };
 

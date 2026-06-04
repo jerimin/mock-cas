@@ -28,6 +28,27 @@ const PAGE_H = 841.89; // A4 height pt
 const M = 40; // margin
 const CONTENT_W = PAGE_W - 2 * M;
 
+interface BehaviourArea { section: string; avgQSec: number; pct: number; }
+interface Behaviour {
+  pace: string;
+  paceDetail: string;
+  totalSec: number;
+  budgetSec: number;
+  pctOfBudget: number;
+  avgQSec: number;
+  medianQSec: number;
+  slowest: Array<{ qid: string; section: string; idx: number; sec: number; status: string }>;
+  struggleAreas: BehaviourArea[];
+  comfortableAreas: BehaviourArea[];
+  rushedSections: BehaviourArea[];
+  totalChanges: number;
+  questionsChanged: number;
+  markedTotal: number;
+  markedCorrect: number;
+  markedNotCorrect: number;
+  revisitedCount: number;
+}
+
 interface Report {
   score: number;
   total: number;
@@ -41,6 +62,7 @@ interface Report {
   perSection: Array<{ section: string; correct: number; partial: number; incorrect: number; skipped: number; total: number; pct: number }>;
   weakest: Array<{ section: string; pct: number; advice: string }>;
   items: Array<{ idx: number; section: string; question: string; options: string[]; correctLetters: string[]; pickedLetters: string[]; status: string; explanation: string }>;
+  behaviour?: Behaviour;
 }
 
 interface Ctx {
@@ -239,6 +261,66 @@ const drawCover = (ctx: Ctx, r: Report) => {
   }
 };
 
+// ---- behaviour analysis ---------------------------------------------------
+const fmtMMSS = (sec: number): string => {
+  const s = Math.max(0, Math.floor(sec));
+  const m = Math.floor(s / 60), ss = s % 60;
+  return `${m}:${String(ss).padStart(2, "0")}`;
+};
+
+const drawBehaviour = (ctx: Ctx, b: Behaviour) => {
+  ensure(ctx, 200);
+  drawText(ctx, "Behaviour analysis", M, ctx.y, { size: 14, font: ctx.fontBold, color: Color.ink });
+  ctx.y -= 16;
+
+  // 4 stat tiles
+  const cardW = (CONTENT_W - 18) / 4;
+  const cardH = 48;
+  const tiles: Array<{ label: string; value: string; sub: string }> = [
+    { label: "PACE",    value: b.pace,                                     sub: `${fmtMMSS(b.totalSec)} of ${fmtMMSS(b.budgetSec)} - ${b.pctOfBudget}%` },
+    { label: "AVG / Q", value: `${b.avgQSec}s`,                             sub: `Median ${b.medianQSec}s` },
+    { label: "MARKED",  value: `${b.markedCorrect} / ${b.markedTotal}`,    sub: "right vs flagged" },
+    { label: "CHANGES", value: `${b.totalChanges}`,                         sub: `${b.questionsChanged} Qs revised` },
+  ];
+  for (let i = 0; i < 4; i++) {
+    const x = M + i * (cardW + 6);
+    drawRect(ctx, x, ctx.y - cardH, cardW, cardH, Color.surface2, Color.border, 0.5);
+    drawText(ctx, tiles[i].label, x + 8, ctx.y - 12, { size: 8, font: ctx.fontBold, color: Color.subtle });
+    drawText(ctx, tiles[i].value, x + 8, ctx.y - 28, { size: 12, font: ctx.fontBold, color: Color.ink });
+    drawText(ctx, tiles[i].sub,   x + 8, ctx.y - 41, { size: 8, color: Color.muted });
+  }
+  ctx.y -= cardH + 10;
+
+  // Insights — struggle / rushed / comfortable
+  const insightBlock = (tag: string, fg: RGB, bg: RGB, items: BehaviourArea[]) => {
+    if (items.length === 0) return;
+    const lineH = 11;
+    const blockH = 22 + items.length * lineH;
+    ensure(ctx, blockH + 6);
+    const topY = ctx.y;
+    drawRect(ctx, M, topY - blockH, CONTENT_W, blockH, bg, undefined, 0);
+    // tag pill
+    const tagW = Math.max(60, ctx.fontBold.widthOfTextAtSize(tag.toUpperCase(), 7) + 14);
+    drawRect(ctx, M + 8, topY - 17, tagW, 12, fg);
+    drawText(ctx, tag.toUpperCase(), M + 8 + 6, topY - 15, { size: 7, font: ctx.fontBold, color: { r: 1, g: 1, b: 1 } });
+    let y = topY - 30;
+    for (const it of items) {
+      drawText(ctx, `- ${it.section} - ${it.pct}%, ${it.avgQSec}s/Q`, M + 12, y, { size: 9, color: Color.muted });
+      y -= lineH;
+    }
+    ctx.y = topY - blockH - 4;
+  };
+
+  insightBlock("Struggled most",   Color.danger,  Color.dangerSoft,  b.struggleAreas);
+  insightBlock("Rushed through",   Color.warning, Color.warningSoft, b.rushedSections);
+  insightBlock("Comfortable on",   Color.success, Color.successSoft, b.comfortableAreas);
+
+  // Pace detail line
+  ensure(ctx, 24);
+  drawWrappedText(ctx, b.paceDetail, M, 9, Color.muted, CONTENT_W);
+  ctx.y -= 4;
+};
+
 // ---- per-question review --------------------------------------------------
 const drawQuestionReview = (ctx: Ctx, r: Report) => {
   newPage(ctx);
@@ -313,6 +395,10 @@ export async function buildReportPdf(report: Report): Promise<Uint8Array> {
   const ctx: Ctx = { pdf, font, fontBold, page: pdf.addPage([PAGE_W, PAGE_H]), y: PAGE_H - M };
   drawRunningHeader(ctx);
   drawCover(ctx, report);
+  if (report.behaviour) {
+    ctx.y -= 8;
+    drawBehaviour(ctx, report.behaviour);
+  }
   drawQuestionReview(ctx, report);
   return await pdf.save();
 }
