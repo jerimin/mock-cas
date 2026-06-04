@@ -277,13 +277,16 @@ function escapeHtml(s: string): string {
 }
 
 function renderSummaryHtml(r: any, hasPdf: boolean): string {
+  // Email-client-safe HTML: solid colors only (no linear-gradient), table-based
+  // layout, bgcolor + style attrs, no rgba (stripped by Outlook).
   const sections = (r.perSection || []) as Array<{ section: string; correct: number; partial: number; incorrect: number; total: number; pct: number }>;
   const weak = (r.weakest || []) as Array<{ section: string; pct: number; advice: string }>;
   const beh = r.behaviour || null;
-  const passColor = r.passed ? "#1f9c5b" : "#d6443b";
-  const passBg = r.passed ? "linear-gradient(135deg,#1f9c5b,#16a463)" : "linear-gradient(135deg,#d6443b,#b8392f)";
-  const passLabel = r.passed ? "Pass" : "Below pass mark";
-  const passEmoji = r.passed ? "" : "";
+  const passed = !!r.passed;
+  const passBg = passed ? "#1f9c5b" : "#d6443b";
+  const passBgDark = passed ? "#157541" : "#a73329";
+  const passBgSoft = passed ? "#e3f6ec" : "#fbe6e4";
+  const passLabel = passed ? "Pass" : "Below pass mark";
 
   const fmtMMSS = (sec: number) => {
     const s = Math.max(0, Math.floor(sec));
@@ -291,133 +294,193 @@ function renderSummaryHtml(r: any, hasPdf: boolean): string {
     return `${m}:${String(ss).padStart(2, "0")}`;
   };
 
-  const behStat = (label: string, value: string, sub: string) =>
-    `<td style="width:25%;padding:5px;"><div style="background:#f6f7fb;border:1px solid #e4e7eb;border-radius:8px;padding:10px 12px;text-align:left;"><div style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:#8b91a0;font-weight:700;">${label}</div><div style="font-size:17px;font-weight:800;color:#0f2549;margin-top:2px;line-height:1.15;font-variant-numeric:tabular-nums;">${value}</div><div style="font-size:11px;color:#5a6276;margin-top:1px;">${sub}</div></div></td>`;
+  // ---- helpers (return TR-cells / TR-rows) --------------------------------
 
-  const behInsight = (tag: string, fg: string, bg: string, items: any[]) => items.length === 0 ? "" :
-    `<div style="margin-top:6px;background:${bg};border-radius:6px;padding:8px 12px;font-size:12px;color:#5a6276;">
-      <span style="display:inline-block;background:${fg};color:#fff;font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 8px;border-radius:99px;margin-right:6px;">${escapeHtml(tag)}</span>
-      <ul style="margin:4px 0 0 18px;padding:0;line-height:1.5;">${items.map((s) => `<li>${escapeHtml(s.section)} - ${s.pct}%, ${s.avgQSec}s/Q</li>`).join("")}</ul>
-    </div>`;
-
-  const tally = (label: string, val: number, fg: string, bg: string) =>
-    `<td style="width:25%;padding:6px;"><div style="background:${bg};border-radius:8px;padding:14px 10px;text-align:center;border:1px solid ${fg}33;"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:${fg};font-weight:700;">${label}</div><div style="font-size:26px;font-weight:800;color:${fg};margin-top:4px;line-height:1;">${val}</div></div></td>`;
+  const tally = (label: string, val: number, fg: string, bg: string) => `
+    <td width="25%" valign="top" bgcolor="${bg}" style="background-color:${bg};padding:14px 8px;text-align:center;border:1px solid ${bg};border-radius:8px;">
+      <div style="font-family:Arial,Helvetica,sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${fg};font-weight:700;">${label}</div>
+      <div style="font-family:Arial,Helvetica,sans-serif;font-size:24px;font-weight:700;color:${fg};margin-top:4px;line-height:1;">${val}</div>
+    </td>`;
 
   const sectionRow = (s: { section: string; correct: number; partial: number; incorrect: number; pct: number }) => {
     const barColor = s.pct >= 80 ? "#1f9c5b" : s.pct < 60 ? "#d6443b" : "#f38020";
+    const filledPct = Math.max(2, Math.min(100, s.pct));
     return `<tr>
-      <td style="padding:10px 12px;border-bottom:1px solid #e4e7eb;font-size:13px;color:#0f2549;">${escapeHtml(s.section)}</td>
-      <td style="padding:10px 12px;border-bottom:1px solid #e4e7eb;font-size:12px;color:#1f9c5b;text-align:center;font-weight:700;">${s.correct}</td>
-      <td style="padding:10px 12px;border-bottom:1px solid #e4e7eb;font-size:12px;color:#c98a16;text-align:center;font-weight:700;">${s.partial}</td>
-      <td style="padding:10px 12px;border-bottom:1px solid #e4e7eb;font-size:12px;color:#d6443b;text-align:center;font-weight:700;">${s.incorrect}</td>
-      <td style="padding:10px 12px;border-bottom:1px solid #e4e7eb;font-size:13px;color:#0f2549;text-align:right;font-weight:700;">${s.pct}%</td>
-      <td style="padding:10px 12px;border-bottom:1px solid #e4e7eb;width:120px;">
-        <div style="height:6px;background:#f6f7fb;border-radius:99px;overflow:hidden;"><div style="height:100%;width:${Math.min(100,s.pct)}%;background:${barColor};border-radius:inherit;"></div></div>
+      <td style="padding:10px 12px;border-bottom:1px solid #e4e7eb;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#0f2549;">${escapeHtml(s.section)}</td>
+      <td align="center" style="padding:10px 8px;border-bottom:1px solid #e4e7eb;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#1f9c5b;font-weight:700;">${s.correct}</td>
+      <td align="center" style="padding:10px 8px;border-bottom:1px solid #e4e7eb;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#c98a16;font-weight:700;">${s.partial}</td>
+      <td align="center" style="padding:10px 8px;border-bottom:1px solid #e4e7eb;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#d6443b;font-weight:700;">${s.incorrect}</td>
+      <td align="right" style="padding:10px 8px;border-bottom:1px solid #e4e7eb;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#0f2549;font-weight:700;">${s.pct}%</td>
+      <td width="120" style="padding:10px 12px;border-bottom:1px solid #e4e7eb;">
+        <table width="100" cellpadding="0" cellspacing="0" border="0" bgcolor="#e4e7eb" style="background-color:#e4e7eb;border-radius:99px;"><tr><td height="5" style="font-size:0;line-height:0;">
+          <table width="${filledPct}%" cellpadding="0" cellspacing="0" border="0" bgcolor="${barColor}" style="background-color:${barColor};border-radius:99px;"><tr><td height="5" style="font-size:0;line-height:0;">&nbsp;</td></tr></table>
+        </td></tr></table>
       </td>
     </tr>`;
   };
 
   const recCard = (w: { section: string; pct: number; advice: string }) => {
     const barColor = w.pct < 50 ? "#d6443b" : "#c98a16";
-    return `<div style="background:#f6f7fb;border-left:4px solid ${barColor};border-radius:8px;padding:14px 16px;margin-bottom:10px;">
-      <div style="font-weight:700;font-size:14px;color:#0f2549;margin-bottom:4px;">${escapeHtml(w.section)} - ${w.pct}%</div>
-      <div style="font-size:13px;color:#5a6276;line-height:1.5;">${escapeHtml(w.advice)}</div>
-    </div>`;
+    return `<table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:10px;"><tr>
+      <td width="4" bgcolor="${barColor}" style="background-color:${barColor};border-radius:8px 0 0 8px;">&nbsp;</td>
+      <td bgcolor="#f6f7fb" style="background-color:#f6f7fb;padding:12px 14px;border-radius:0 8px 8px 0;">
+        <div style="font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:14px;color:#0f2549;margin-bottom:4px;">${escapeHtml(w.section)} - ${w.pct}%</div>
+        <div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#5a6276;line-height:1.5;">${escapeHtml(w.advice)}</div>
+      </td>
+    </tr></table>`;
   };
 
+  const behStat = (label: string, value: string, sub: string) => `
+    <td width="25%" valign="top" bgcolor="#f6f7fb" style="background-color:#f6f7fb;padding:12px;border:1px solid #e4e7eb;border-radius:8px;text-align:left;">
+      <div style="font-family:Arial,Helvetica,sans-serif;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#8b91a0;font-weight:700;">${label}</div>
+      <div style="font-family:Arial,Helvetica,sans-serif;font-size:17px;font-weight:700;color:#0f2549;margin-top:3px;line-height:1.15;">${value}</div>
+      <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#5a6276;margin-top:2px;">${sub}</div>
+    </td>`;
+
+  const behInsight = (tag: string, fg: string, bg: string, items: any[]) => items.length === 0 ? "" : `
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:8px;"><tr>
+      <td bgcolor="${bg}" style="background-color:${bg};padding:10px 14px;border-radius:6px;">
+        <table cellpadding="0" cellspacing="0" border="0"><tr>
+          <td bgcolor="${fg}" style="background-color:${fg};padding:3px 9px;border-radius:99px;">
+            <span style="font-family:Arial,Helvetica,sans-serif;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#ffffff;">${escapeHtml(tag)}</span>
+          </td>
+        </tr></table>
+        <div style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#5a6276;margin-top:6px;line-height:1.55;">
+          ${items.map((s) => `&bull; ${escapeHtml(s.section)} - ${s.pct}%, ${s.avgQSec}s per Q`).join("<br>")}
+        </div>
+      </td>
+    </tr></table>`;
+
   return `<!doctype html>
-<html><head><meta charset="utf-8"><title>GB0-713 mock — your result</title></head>
-<body style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f4f5f7;margin:0;padding:24px;color:#0f2549;">
-<div style="max-width:640px;margin:0 auto;">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>GB0-713 mock - your result</title>
+  <!--[if mso]><style>table,td,div,h1,p {font-family: Arial, sans-serif !important;}</style><![endif]-->
+</head>
+<body bgcolor="#f4f5f7" style="margin:0;padding:0;background-color:#f4f5f7;font-family:Arial,Helvetica,sans-serif;color:#0f2549;">
 
-  <!-- header / brand -->
-  <div style="background:linear-gradient(135deg,#F38020,#FAAD3F);border-radius:14px 14px 0 0;padding:22px 28px;color:#fff;">
-    <div style="display:inline-block;background:rgba(255,255,255,.18);padding:5px 12px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.1em;">GB0-713 MOCK</div>
-    <h1 style="margin:10px 0 2px;font-size:22px;font-weight:800;letter-spacing:-.01em;">Your result is in</h1>
-    <p style="margin:0;font-size:13px;opacity:.95;">H3CNE-Cloud - Deploy and Manage the H3C CAS Virtualization Platform</p>
-  </div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f4f5f7" style="background-color:#f4f5f7;">
+  <tr><td align="center" style="padding:24px;">
 
-  <!-- score banner -->
-  <div style="background:${passBg};color:#fff;padding:24px 28px;border-radius:0;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+    <table role="presentation" width="640" cellpadding="0" cellspacing="0" border="0" style="max-width:640px;width:100%;">
+
+      <!-- BRAND HEADER (solid CF orange) -->
       <tr>
-        <td style="vertical-align:middle;">
-          <div style="font-size:54px;font-weight:800;line-height:1;letter-spacing:-.03em;">${r.score}<span style="color:rgba(255,255,255,.78);font-size:22px;font-weight:600;"> / ${r.total}</span></div>
-          <div style="margin-top:6px;font-size:13px;color:rgba(255,255,255,.92);">Took ${r.tookFmt}</div>
+        <td bgcolor="#F38020" style="background-color:#F38020;padding:22px 28px;border-radius:14px 14px 0 0;">
+          <table cellpadding="0" cellspacing="0" border="0"><tr>
+            <td bgcolor="#ffffff" style="background-color:#ffffff;padding:4px 12px;border-radius:99px;">
+              <span style="font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;color:#F38020;">GB0-713 MOCK</span>
+            </td>
+          </tr></table>
+          <h1 style="margin:12px 0 2px;font-family:Arial,Helvetica,sans-serif;font-size:22px;font-weight:700;color:#ffffff;line-height:1.2;">Your result is in</h1>
+          <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#ffffff;">H3CNE-Cloud - Deploy and Manage the H3C CAS Virtualization Platform</p>
         </td>
-        <td style="vertical-align:middle;text-align:right;">
-          <div style="display:inline-block;background:rgba(255,255,255,.22);padding:8px 18px;border-radius:99px;font-size:14px;font-weight:700;letter-spacing:.02em;">${passLabel} - ${r.pct}%</div>
-          <div style="margin-top:6px;font-size:11px;color:rgba(255,255,255,.78);">Pass mark: 60%</div>
+      </tr>
+
+      <!-- SCORE BANNER (solid green or red) -->
+      <tr>
+        <td bgcolor="${passBg}" style="background-color:${passBg};padding:22px 28px;">
+          <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td valign="middle">
+              <div style="font-family:Arial,Helvetica,sans-serif;font-size:46px;font-weight:700;line-height:1;color:#ffffff;">${r.score}<span style="font-size:20px;font-weight:400;color:#ffffff;">&nbsp;/ ${r.total}</span></div>
+              <div style="margin-top:6px;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#ffffff;">Took ${escapeHtml(r.tookFmt)}</div>
+            </td>
+            <td valign="middle" align="right">
+              <table cellpadding="0" cellspacing="0" border="0"><tr>
+                <td bgcolor="${passBgDark}" style="background-color:${passBgDark};padding:8px 18px;border-radius:99px;">
+                  <span style="font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;color:#ffffff;">${passLabel} - ${r.pct}%</span>
+                </td>
+              </tr></table>
+              <div style="margin-top:6px;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#ffffff;">Pass mark: 60%</div>
+            </td>
+          </tr></table>
+        </td>
+      </tr>
+
+      <!-- BODY -->
+      <tr>
+        <td bgcolor="#ffffff" style="background-color:#ffffff;padding:22px 28px 28px;border-radius:0 0 14px 14px;">
+
+          <!-- 4 tallies -->
+          <table width="100%" cellpadding="0" cellspacing="6" border="0"><tr>
+            ${tally("Correct",   r.correctCount,   "#1f9c5b", "#e3f6ec")}
+            ${tally("Partial",   r.partialCount,   "#c98a16", "#fbf2dc")}
+            ${tally("Incorrect", r.incorrectCount, "#d6443b", "#fbe6e4")}
+            ${tally("Skipped",   r.skippedCount,   "#5a6276", "#f0f2f8")}
+          </tr></table>
+
+          ${hasPdf ? `
+          <!-- PDF attached notice -->
+          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top:16px;"><tr>
+            <td bgcolor="#fff7ec" style="background-color:#fff7ec;border:1px solid #f3b070;border-radius:8px;padding:12px 14px;">
+              <table cellpadding="0" cellspacing="0" border="0"><tr>
+                <td bgcolor="#F38020" style="background-color:#F38020;padding:5px 9px;border-radius:5px;" valign="middle">
+                  <span style="font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:#ffffff;">PDF</span>
+                </td>
+                <td valign="middle" style="padding-left:12px;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#0f2549;">
+                  <strong>Detailed report attached.</strong> Open the PDF for the full question-by-question review with correct answers and explanations.
+                </td>
+              </tr></table>
+            </td>
+          </tr></table>` : ""}
+
+          <!-- Section breakdown -->
+          <h2 style="font-family:Arial,Helvetica,sans-serif;font-size:15px;margin:22px 0 10px;color:#0f2549;">Section breakdown</h2>
+          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <thead>
+              <tr>
+                <th align="left"   style="padding:8px 12px;border-bottom:1px solid #e4e7eb;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#8b91a0;">Section</th>
+                <th align="center" style="padding:8px 8px;border-bottom:1px solid #e4e7eb;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#8b91a0;">OK</th>
+                <th align="center" style="padding:8px 8px;border-bottom:1px solid #e4e7eb;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#8b91a0;">1/2</th>
+                <th align="center" style="padding:8px 8px;border-bottom:1px solid #e4e7eb;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#8b91a0;">X</th>
+                <th align="right"  style="padding:8px 8px;border-bottom:1px solid #e4e7eb;font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#8b91a0;">%</th>
+                <th               style="padding:8px 12px;border-bottom:1px solid #e4e7eb;"></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${sections.map(sectionRow).join("")}
+            </tbody>
+          </table>
+
+          <!-- Recommendations -->
+          <h2 style="font-family:Arial,Helvetica,sans-serif;font-size:15px;margin:22px 0 10px;color:#0f2549;">${weak.length === 0 ? "Recommendations" : "Focus areas before retaking"}</h2>
+          ${weak.length === 0
+            ? `<table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+                 <td width="4" bgcolor="#1f9c5b" style="background-color:#1f9c5b;border-radius:8px 0 0 8px;">&nbsp;</td>
+                 <td bgcolor="${passBgSoft}" style="background-color:${passBgSoft};padding:12px 14px;border-radius:0 8px 8px 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#0f2549;"><strong>Strong across every module.</strong> Run another shuffled mock to verify consistency.</td>
+               </tr></table>`
+            : weak.map(recCard).join("")}
+
+          ${beh ? `
+          <!-- Behaviour analysis -->
+          <h2 style="font-family:Arial,Helvetica,sans-serif;font-size:15px;margin:22px 0 10px;color:#0f2549;">Behaviour analysis</h2>
+          <table width="100%" cellpadding="0" cellspacing="5" border="0"><tr>
+            ${behStat("Pace", escapeHtml(beh.pace), `${fmtMMSS(beh.totalSec)} of ${fmtMMSS(beh.budgetSec)} - ${beh.pctOfBudget}%`)}
+            ${behStat("Avg / Q", `${beh.avgQSec}s`, `Median ${beh.medianQSec}s`)}
+            ${behStat("Marked", `${beh.markedCorrect} / ${beh.markedTotal}`, "right vs flagged")}
+            ${behStat("Changes", String(beh.totalChanges), `${beh.questionsChanged} Qs revised`)}
+          </tr></table>
+          ${behInsight("Struggled most", "#d6443b", "#fbe6e4", beh.struggleAreas || [])}
+          ${behInsight("Rushed through", "#c98a16", "#fbf2dc", beh.rushedSections || [])}
+          ${behInsight("Comfortable on", "#1f9c5b", "#e3f6ec", beh.comfortableAreas || [])}
+          <div style="margin-top:10px;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#5a6276;line-height:1.5;">${escapeHtml(beh.paceDetail || "")}</div>
+          ` : ""}
+
+          <!-- Footer -->
+          <div style="margin-top:22px;padding-top:14px;border-top:1px solid #e4e7eb;font-family:Arial,Helvetica,sans-serif;color:#8b91a0;font-size:11px;text-align:center;">
+            Independent study tool - not affiliated with or endorsed by H3C. Reply is not monitored.
+          </div>
         </td>
       </tr>
     </table>
-  </div>
 
-  <!-- white card with tallies + breakdown + recs + footer -->
-  <div style="background:#fff;border-radius:0 0 14px 14px;padding:24px 28px 28px;box-shadow:0 4px 24px rgba(15,20,38,.08);">
-
-    <!-- tallies -->
-    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;border-spacing:6px;margin-bottom:8px;">
-      <tr>
-        ${tally("Correct",   r.correctCount,   "#1f9c5b", "#e3f6ec")}
-        ${tally("Partial",   r.partialCount,   "#c98a16", "#fbf2dc")}
-        ${tally("Incorrect", r.incorrectCount, "#d6443b", "#fbe6e4")}
-        ${tally("Skipped",   r.skippedCount,   "#5a6276", "#f6f7fb")}
-      </tr>
-    </table>
-
-    <!-- attachment notice -->
-    ${hasPdf ? `<div style="margin-top:18px;padding:14px 16px;background:#fff7ec;border:1px solid #f3b070;border-radius:10px;display:flex;align-items:center;gap:12px;">
-      <div style="background:#F38020;color:#fff;font-weight:700;font-size:11px;padding:5px 9px;border-radius:6px;letter-spacing:.05em;">PDF</div>
-      <div style="font-size:13px;color:#0f2549;"><strong>Detailed report attached.</strong> Open the PDF for the full question-by-question review with correct answers and explanations.</div>
-    </div>` : ""}
-
-    <!-- section breakdown -->
-    <h2 style="font-size:15px;margin:24px 0 10px;color:#0f2549;letter-spacing:-.01em;">Section breakdown</h2>
-    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:13px;">
-      <thead><tr style="text-align:left;color:#8b91a0;font-size:10px;text-transform:uppercase;letter-spacing:.07em;">
-        <th style="padding:8px 12px;border-bottom:1px solid #e4e7eb;font-weight:700;">Section</th>
-        <th style="padding:8px 12px;border-bottom:1px solid #e4e7eb;text-align:center;font-weight:700;">OK</th>
-        <th style="padding:8px 12px;border-bottom:1px solid #e4e7eb;text-align:center;font-weight:700;">1/2</th>
-        <th style="padding:8px 12px;border-bottom:1px solid #e4e7eb;text-align:center;font-weight:700;">X</th>
-        <th style="padding:8px 12px;border-bottom:1px solid #e4e7eb;text-align:right;font-weight:700;">%</th>
-        <th style="padding:8px 12px;border-bottom:1px solid #e4e7eb;font-weight:700;"></th>
-      </tr></thead>
-      <tbody>
-        ${sections.map(sectionRow).join("")}
-      </tbody>
-    </table>
-
-    <!-- recommendations -->
-    <h2 style="font-size:15px;margin:24px 0 10px;color:#0f2549;letter-spacing:-.01em;">${weak.length === 0 ? "Recommendations" : "Focus areas before retaking"}</h2>
-    ${weak.length === 0
-      ? `<div style="background:#e3f6ec;border-left:4px solid #1f9c5b;border-radius:8px;padding:14px 16px;font-size:13px;color:#0f2549;"><strong>Strong across every module.</strong> Run another shuffled mock to verify consistency.</div>`
-      : weak.map(recCard).join("")}
-
-    ${beh ? `
-    <!-- behaviour -->
-    <h2 style="font-size:15px;margin:24px 0 10px;color:#0f2549;letter-spacing:-.01em;">Behaviour analysis</h2>
-    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;border-spacing:5px;">
-      <tr>
-        ${behStat("Pace", escapeHtml(beh.pace), `${fmtMMSS(beh.totalSec)} of ${fmtMMSS(beh.budgetSec)} - ${beh.pctOfBudget}%`)}
-        ${behStat("Avg / Q", `${beh.avgQSec}s`, `Median ${beh.medianQSec}s`)}
-        ${behStat("Marked", `${beh.markedCorrect}<span style="color:#8b91a0;font-size:13px;font-weight:500;"> / ${beh.markedTotal}</span>`, "right vs flagged")}
-        ${behStat("Changes", String(beh.totalChanges), `${beh.questionsChanged} Qs revised`)}
-      </tr>
-    </table>
-    ${behInsight("Struggled most", "#d6443b", "#fbe6e4", beh.struggleAreas || [])}
-    ${behInsight("Rushed through", "#c98a16", "#fbf2dc", beh.rushedSections || [])}
-    ${behInsight("Comfortable on", "#1f9c5b", "#e3f6ec", beh.comfortableAreas || [])}
-    <div style="margin-top:8px;font-size:12px;color:#5a6276;line-height:1.5;">${escapeHtml(beh.paceDetail || "")}</div>
-    ` : ""}
-
-    <!-- footer -->
-    <div style="margin-top:24px;padding-top:14px;border-top:1px solid #e4e7eb;color:#8b91a0;font-size:11px;text-align:center;">
-      Independent study tool - not affiliated with or endorsed by H3C. Reply is not monitored.
-    </div>
-  </div>
-</div>
-</body></html>`;
+  </td></tr>
+</table>
+</body>
+</html>`;
 }
 
 function renderEmailText(r: any): string {
