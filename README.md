@@ -1,8 +1,23 @@
 # mock-cas
 
+[![v1.0.0](https://img.shields.io/badge/version-1.0.0-F38020.svg)](https://github.com/jerimin/mock-cas/releases/tag/v1.0.0)
+[![Status: locked](https://img.shields.io/badge/status-locked-1F9C5B.svg)](#status)
+
 Timed mock exam for **GB0-713 — Deploy and Manage the H3C CAS Virtualization Platform (H3CNE-Cloud)**. Live at https://mock.mymine.space.
 
 Vanilla HTML + CSS + JS, served from Cloudflare Workers Static Assets with a tiny Worker for stats, visit tracking, and emailing the detailed report. No framework. No build step beyond `wrangler deploy`.
+
+## Status
+
+**Locked at v1.0.0** — feature-complete; merges to `main` should be limited to bank-content updates, CF deploy fixes, and security patches. Major behaviour changes warrant a v2 branch.
+
+What's locked at v1.0.0:
+- Bank: 250 questions (25/50/38/50/50/37 per module · 40/29/30 single/multi/negative · zero duplicates)
+- Engine: 50Q/60min/60% pass policy, partial credit, end-anytime, stratified sampling, behaviour analysis (timing/marks/changes)
+- Email flow: 6-digit verification → SMTP2GO HTML summary email + PDF attachment (pdf-lib, Worker-side)
+- UI: CF-style light + dark themes, distinct nav-grid colours, fits a single viewport, 10s Cloud Digit sponsored toast on result
+- Worker: `/api/stats`, `/api/track`, `/api/email-verify-init`, `/api/email-verify-confirm`
+- KV: `mock-cas-stats` (id `0239f7fd…`) bound as `STATS_KV`
 
 ## Layout
 

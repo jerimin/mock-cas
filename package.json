@@ -1,8 +1,8 @@
 {
   "name": "mock-cas",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "private": true,
-  "description": "Timed mock exam — H3C CAS Cloud Automation System. Cloudflare Workers Static Assets.",
+  "description": "Timed mock exam for GB0-713 (H3CNE-Cloud) — 250-question bank, partial credit, verified email + PDF report. Cloudflare Workers Static Assets at mock.mymine.space.",
   "scripts": {
     "deploy": "wrangler deploy",
     "dev": "wrangler dev"
