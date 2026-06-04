@@ -168,3 +168,48 @@ describe("VALID_FORMATS — exhaustive", () => {
     expect(VALID_FORMATS).toEqual(["single", "multi", "negative"]);
   });
 });
+
+describe("validateQuestion — source-leak detection", () => {
+  // Note: "the official syllabus" is intentionally allowed — it's how the SITE
+  // communicates the real H3C exam policy (50Q/60min/60% pass), not a private source.
+  const leakStems = [
+    "Per the course, which is correct?",
+    "Among the items listed in the PDF, which is incorrect?",
+    "According to the module, which is true?",
+    "Which of the following is shown in the slide?",
+    "Which statement appears in the table?",
+    "Which is defined in the textbook?",
+  ];
+  for (const stem of leakStems) {
+    it(`flags "${stem}" as ERROR`, () => {
+      const q = goodSingle();
+      q.question = stem;
+      const errs = validateQuestion(q).filter((i) => i.severity === SEVERITY.ERROR);
+      expect(errs.some((i) => /leaks source material/.test(i.message))).toBe(true);
+    });
+  }
+  it("flags explanation leaks", () => {
+    const q = goodSingle();
+    q.explanation = "The course states that vMotion needs no shared storage.";
+    const errs = validateQuestion(q).filter((i) => i.severity === SEVERITY.ERROR);
+    expect(errs.some((i) => /leaks source material/.test(i.message))).toBe(true);
+  });
+  it("flags option leaks", () => {
+    const q = goodSingle();
+    q.options = [q.options[0], q.options[1], "as listed in the course", q.options[3]];
+    const errs = validateQuestion(q).filter((i) => i.severity === SEVERITY.ERROR);
+    expect(errs.some((i) => /option \d+ leaks source material/.test(i.message))).toBe(true);
+  });
+  it('allows legitimate "the reference port" (LACP term)', () => {
+    const q = goodSingle();
+    q.explanation = "In static aggregation, the reference port is selected by criteria including priority and ID.";
+    const errs = validateQuestion(q).filter((i) => i.severity === SEVERITY.ERROR);
+    expect(errs.some((i) => /leaks source material/.test(i.message))).toBe(false);
+  });
+  it('allows "the reference architecture"', () => {
+    const q = goodSingle();
+    q.explanation = "The reference architecture for HA requires shared storage and at least two CVK hosts.";
+    const errs = validateQuestion(q).filter((i) => i.severity === SEVERITY.ERROR);
+    expect(errs.some((i) => /leaks source material/.test(i.message))).toBe(false);
+  });
+});

@@ -18,6 +18,33 @@ export const SEVERITY = Object.freeze({
 const VAGUE_STEM = /\b(best describes?|in your opinion|how do you feel|favorite|favourite)\b/i;
 const ABSURD_DISTRACTOR = /\b(color scheme|colour scheme|ignoring security|user satisfaction|interface looks|magical|coffee)\b/i;
 
+/**
+ * Source-leak detector — flags any reference that hints at private course/PDF
+ * material. The public-facing site must not betray that questions were derived
+ * from internal study material.
+ *
+ * Allowed technical false-positives are explicitly excluded via lookahead:
+ *   - "the reference port" / "the reference architecture" / "the reference design"
+ */
+const SOURCE_LEAK = new RegExp(
+  "\\b(?:" +
+    "the\\s+(?:CAS\\s+)?course" +
+    "|the\\s+PDF" +
+    "|the\\s+module|the\\s+chapter" +
+    "|the\\s+slide(?!\\s+exactly)" +
+    "|the\\s+page|the\\s+manual|the\\s+textbook|the\\s+syllabus" +
+    "|the\\s+document(?:ed|s)?" +
+    "|the\\s+reference(?!\\s+(?:port|architecture|implementation|design|configuration|model|table|guide|number))" +
+    "|page\\s+(?:lists?|enumerates?|states?|defines?|shows?)" +
+    "|slide\\s+(?:lists?|enumerates?|states?|defines?|shows?)" +
+    "|in\\s+the\\s+(?:course|PDF|module|chapter|slide|page|figure|table|syllabus|document|manual|textbook)" +
+    "|per\\s+the\\s+(?:course|PDF|module|chapter|slide|page|figure|table|syllabus|document|manual|textbook)" +
+    "|according\\s+to\\s+the\\s+(?:course|PDF|module|chapter|slide|page|figure|table|syllabus|document|manual|textbook)" +
+    "|(?:listed|described|defined|stated|presented|shown)\\s+in\\s+the\\s+(?:course|PDF|module|chapter|slide|page|figure|table|syllabus|document|manual|textbook)" +
+  ")\\b",
+  "i"
+);
+
 // --- per-question validators -------------------------------------------------
 
 /** Returns an array of issue objects for a single question. */
@@ -74,11 +101,24 @@ export function validateQuestion(q, ctx = {}) {
   if (typeof q.question === "string") {
     if (q.question.trim().length < 20) push(SEVERITY.WARN, `question stem is very short (${q.question.trim().length} chars)`);
     if (VAGUE_STEM.test(q.question)) push(SEVERITY.WARN, `vague stem phrasing — H3C voice prefers "Among the following descriptions of X, which is correct/incorrect"`);
+    const m = SOURCE_LEAK.exec(q.question);
+    if (m) push(SEVERITY.ERROR, `question leaks source material: "${m[0]}" — site is public, course/PDF references must be scrubbed`);
   }
 
   // Explanation
   if (typeof q.explanation === "string") {
     if (q.explanation.trim().length < 30) push(SEVERITY.WARN, `explanation is short (${q.explanation.trim().length} chars) — aim for >=30`);
+    const m = SOURCE_LEAK.exec(q.explanation);
+    if (m) push(SEVERITY.ERROR, `explanation leaks source material: "${m[0]}" — site is public, course/PDF references must be scrubbed`);
+  }
+
+  // Options — leak-scan each
+  if (Array.isArray(q.options)) {
+    q.options.forEach((o, i) => {
+      if (typeof o !== "string") return;
+      const m = SOURCE_LEAK.exec(o);
+      if (m) push(SEVERITY.ERROR, `option ${i} leaks source material: "${m[0]}"`);
+    });
   }
 
   return issues;

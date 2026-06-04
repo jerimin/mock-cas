@@ -1,6 +1,6 @@
 # mock-cas
 
-[![v1.0.0](https://img.shields.io/badge/version-1.0.0-F38020.svg)](https://github.com/jerimin/mock-cas/releases/tag/v1.0.0)
+[![v1.2.0](https://img.shields.io/badge/version-1.2.0-F38020.svg)](https://github.com/jerimin/mock-cas/releases/tag/v1.2.0)
 [![Status: locked](https://img.shields.io/badge/status-locked-1F9C5B.svg)](#status)
 
 Timed mock exam for **GB0-713 — Deploy and Manage the H3C CAS Virtualization Platform (H3CNE-Cloud)**. Live at https://mock.mymine.space.
@@ -11,12 +11,13 @@ Vanilla HTML + CSS + JS, served from Cloudflare Workers Static Assets with a tin
 
 **Locked at v1.1.0** — feature-complete; merges to `main` should be limited to bank-content updates, CF deploy fixes, security patches, and additional tests. Major behaviour changes warrant a v2 branch.
 
-Always run `npm run check` before pushing (it runs `tsc --noEmit && validate && test`). All four targeted-regression tests block:
+Always run `npm run check` before pushing (it runs `tsc --noEmit && validate && test`). All five targeted-regression tests block:
 
 - A 6-option question (the v1.0.0 bug where intro-06 escaped initial verification)
 - An exact-stem duplicate (the deploy-27 vs deploy-12 bug)
 - A format-vs-correctIndices mismatch (single with 2 indices, multi with 1)
 - An out-of-range correctIndex
+- Any reference to private source material ("the course", "the PDF", "the module", "the slide", "in the table", etc. — see `SOURCE_LEAK` regex in `schema.js`). Allowed false-positives: "the reference port" (LACP), "the reference architecture".
 
 What's locked at v1.0.0:
 - Bank: 250 questions (25/50/38/50/50/37 per module · 40/29/30 single/multi/negative · zero duplicates)

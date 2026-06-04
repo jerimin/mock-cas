@@ -13,13 +13,13 @@
     "correctIndices": [
       2
     ],
-    "explanation": "The course states that IRF is the network device N:1 virtualization technology that virtualizes multiple physical network devices into one network device, while MDC is the 1:N technology that virtualizes a single device into multiple logical ones."
+    "explanation": "IRF is the network device N:1 virtualization technology that virtualizes multiple physical network devices into one network device, while MDC is the 1:N technology that virtualizes a single device into multiple logical ones."
   },
   {
     "id": "intro-02",
     "section": "Virtualization Introduction",
     "format": "single",
-    "question": "Which of the following statements about server virtualization, as defined in the course, is correct?",
+    "question": "Which of the following statements about server virtualization is correct?",
     "options": [
       "Server virtualization keeps each physical server bound to a single OS instance to maximize per-host performance.",
       "Server virtualization turns physical servers into logical resources with several isolated VMs running on them, improving resource utilization and simplifying management.",
@@ -29,13 +29,13 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The course defines server virtualization as making physical servers into logical resources with several isolated VMs running on them, leading to improved resource utilization, simplified management, server consolidation and greater agility."
+    "explanation": "Server virtualization turns physical servers into logical resources with several isolated VMs running on them, leading to improved resource utilization, simplified management, server consolidation and greater agility."
   },
   {
     "id": "intro-03",
     "section": "Virtualization Introduction",
     "format": "single",
-    "question": "Regarding the widely recognized definition of cloud computing cited in the course (referencing the NIST definition), which of the following statements is correct?",
+    "question": "Regarding the widely recognized definition of cloud computing (referencing the NIST definition), which of the following statements is correct?",
     "options": [
       "Cloud computing is a hardware procurement model that requires direct negotiation with service providers for every resource request.",
       "Cloud computing is a service mode that allows users to easily obtain and release resources from a shared resource pool through the network without complicated interaction with service providers.",
@@ -45,13 +45,13 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The course quotes the widely recognized (NIST) definition: cloud computing is a service mode that allows users to easily obtain and release resources (network, server, storage, application, service) in a shared resource pool through the network without complicated communication and interaction with service providers."
+    "explanation": "The widely recognized (NIST) definition: cloud computing is a service mode that allows users to easily obtain and release resources (network, server, storage, application, service) in a shared resource pool through the network without complicated communication and interaction with service providers."
   },
   {
     "id": "intro-04",
     "section": "Virtualization Introduction",
     "format": "single",
-    "question": "Among the following descriptions of vMotion as presented in the CAS course, which is correct?",
+    "question": "Among the following descriptions of vMotion, which is correct?",
     "options": [
       "vMotion requires shared storage and supports only offline migration between hosts in the same cluster.",
       "vMotion is limited to host migration only and does not support storage migration.",
@@ -61,7 +61,7 @@
     "correctIndices": [
       2
     ],
-    "explanation": "The course states vMotion needs no shared storage; supports host, storage and host+storage migration; supports cross-host, cross-cluster, cross-host-pool online/offline migration and cross-CVM long-distance migration; and is the core foundation of HA, DRS and DPM."
+    "explanation": "vMotion needs no shared storage; supports host, storage and host+storage migration; supports cross-host, cross-cluster, cross-host-pool online/offline migration and cross-CVM long-distance migration; and is the core foundation of HA, DRS and DPM."
   },
   {
     "id": "intro-05",
@@ -77,13 +77,13 @@
     "correctIndices": [
       0
     ],
-    "explanation": "The course explicitly states CAS native backup has no additional cost, but its limitations are low backup rate (small scenarios), only VM backup (no database/file), and no deduplication, compression, or encryption features."
+    "explanation": "CAS native backup has no additional cost, but its limitations are low backup rate (small scenarios), only VM backup (no database/file), and no deduplication, compression, or encryption features."
   },
   {
     "id": "intro-06",
     "section": "Virtualization Introduction",
     "format": "negative",
-    "question": "Among the following items, which is NOT one of the five features of cloud computing listed in the course?",
+    "question": "Among the following items, which is NOT one of the five features of cloud computing?",
     "options": [
       "Self-service",
       "Flexible scheduling",
@@ -94,13 +94,13 @@
     "correctIndices": [
       4
     ],
-    "explanation": "The course's 'Five features of cloud computing' page enumerates Self-service, Flexible scheduling, Resource pooling, Network distribution, and Service measurable. Continuous deduplication is not listed."
+    "explanation": "Self-service, Flexible scheduling, Resource pooling, Network distribution, and Service measurable. Continuous deduplication is not listed."
   },
   {
     "id": "intro-07",
     "section": "Virtualization Introduction",
     "format": "multi",
-    "question": "Which of the following statements about the three service modes of cloud computing presented in the course are correct?",
+    "question": "Which of the following statements about the three service modes of cloud computing are correct?",
     "options": [
       "IaaS provides physical machines and VM virtualization at the infrastructure layer, including computing, storage, network and computer room infrastructure.",
       "PaaS provides middleware & runtime, database, and operating system on top of the IaaS layer.",
@@ -113,13 +113,13 @@
       1,
       2
     ],
-    "explanation": "The course's 'Three service modes' diagram shows IaaS covers physical/VM virtualization plus computing/storage/network/computer room; PaaS adds OS, database, middleware & runtime; SaaS adds the application software and data & information. Options D and E swap these layer boundaries."
+    "explanation": "IaaS covers physical/VM virtualization plus computing/storage/network/computer room; PaaS adds OS, database, middleware & runtime; SaaS adds the application software and data & information. Options D and E swap these layer boundaries."
   },
   {
     "id": "intro-08",
     "section": "Virtualization Introduction",
     "format": "multi",
-    "question": "Which of the following are listed in the course as the three storage virtualization implementation types?",
+    "question": "Which of the following are the three storage virtualization implementation types?",
     "options": [
       "Storage virtualization based on host",
       "Storage virtualization based on storage device",
@@ -132,13 +132,13 @@
       1,
       2
     ],
-    "explanation": "The course's storage virtualization page lists exactly three types: based on host, based on storage device, and based on network device (the latter using a smart switch with built-in virtualization software)."
+    "explanation": "Storage virtualization has exactly three implementation types: based on host, based on storage device, and based on network device (the latter using a smart switch with built-in virtualization software)."
   },
   {
     "id": "intro-09",
     "section": "Virtualization Introduction",
     "format": "multi",
-    "question": "Which of the following items are explicitly listed in the course as values of virtualization technology?",
+    "question": "Which of the following items are values of virtualization technology?",
     "options": [
       "High-availability guarantee through virtualized HA capability for continuous service running",
       "Hardware cost saving as the most intuitive expression of server virtualization",
@@ -151,7 +151,7 @@
       1,
       2
     ],
-    "explanation": "The 'Value of virtualization technology' slide lists high-availability guarantee, hardware cost saving (most intuitive expression of server virtualization), and power cost saving up to 90% via virtualization integration and intelligent power management, along with software/management cost savings and scalability/agility."
+    "explanation": "The values of virtualization technology include high-availability guarantee, hardware cost saving (the most intuitive expression of server virtualization), power cost saving of up to 90% via virtualization integration and intelligent power management, software/management cost savings, and scalability/agility."
   },
   {
     "id": "intro-10",
@@ -173,7 +173,7 @@
     "id": "intro-11",
     "section": "Virtualization Introduction",
     "format": "negative",
-    "question": "Regarding the deployment models of cloud computing described in the course, which of the following statements is incorrect?",
+    "question": "Regarding the deployment models of cloud computing, which of the following statements is incorrect?",
     "options": [
       "Public cloud is owned and managed by the cloud service provider, offering standardized cloud service products ordered on demand.",
       "Private cloud is described as a system for internal office use by enterprise users.",
@@ -183,13 +183,13 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The course defines public cloud as provider-owned/managed on-demand standardized services (not a single-tenant on-premises deployment), so option D is incorrect. Options A, B and C match the course descriptions of public, private and hybrid cloud."
+    "explanation": "Public cloud as provider-owned/managed on-demand standardized services (not a single-tenant on-premises deployment), so option D is incorrect. Options A, B and C match standard CAS descriptions of public, private and hybrid cloud."
   },
   {
     "id": "intro-12",
     "section": "Virtualization Introduction",
     "format": "negative",
-    "question": "Regarding the H3C cloud computing overall solution architecture shown in the course, which of the following statements is incorrect?",
+    "question": "Regarding the H3C cloud computing overall solution architecture, which of the following statements is incorrect?",
     "options": [
       "CAS is positioned as the computing virtualization component of the H3C cloud computing solution.",
       "ONEStor is positioned as the storage virtualization component of the H3C cloud computing solution.",
@@ -199,13 +199,13 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The 'Overall solution of H3C cloud computing' diagram pairs CAS (computing virtualization), SDN (network virtualization), and ONEStor (storage virtualization), all running on the UIS Unified Infrastructure System. DOVE does not appear in the H3C diagram."
+    "explanation": "The H3C cloud computing overall solution pairs CAS (computing virtualization), SDN (network virtualization), and ONEStor (storage virtualization), all running on the UIS Unified Infrastructure System. DOVE is not part of the H3C solution."
   },
   {
     "id": "intro-13",
     "section": "Virtualization Introduction",
     "format": "single",
-    "question": "Regarding the data center evolution trend from Bare Metal to Virtualization to Container as described in the course, which of the following statements is correct?",
+    "question": "Regarding the data center evolution trend from Bare Metal to Virtualization to Container, which of the following statements is correct?",
     "options": [
       "In the Bare Metal stage, every application uses its own Hypervisor running directly above the HostOS to achieve isolation.",
       "Compared with Bare Metal, the Virtualization stage brings higher resource utilization, higher system availability, better compatibility, faster go business and simpler operation.",
@@ -215,13 +215,13 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The 'Evolution trend of Data Center' slide lists Bare Metal weaknesses (uneven resource utilization, upgrade difficulty, management complexity), and explicitly attributes higher resource utilization, higher system availability, better compatibility, faster go business and simpler operation to the Virtualization stage."
+    "explanation": "Bare Metal has weaknesses such as uneven resource utilization, upgrade difficulty, and management complexity. The Virtualization stage delivers higher resource utilization, higher system availability, better compatibility, faster go business and simpler operation."
   },
   {
     "id": "intro-14",
     "section": "Virtualization Introduction",
     "format": "multi",
-    "question": "According to the 'What is virtualization' page, which of the following statements about virtualization are correct?",
+    "question": "Which of the following statements about virtualization are correct?",
     "options": [
       "The objects of virtualization are various resources.",
       "Virtualized logical resources hide unnecessary details from users.",
@@ -234,13 +234,13 @@
       1,
       2
     ],
-    "explanation": "The 'What is virtualization' page lists exactly three points: objects of virtualization are various resources; virtualized logical resources hide unnecessary details from users; users can implement some or all functions of a real environment in a virtual environment."
+    "explanation": "Virtualization has three defining points: the objects of virtualization are various resources; virtualized logical resources hide unnecessary details from users; and users can implement some or all functions of a real environment in a virtual environment."
   },
   {
     "id": "intro-15",
     "section": "Virtualization Introduction",
     "format": "single",
-    "question": "Regarding the cloud computing development timeline shown in the course, which of the following statements is correct?",
+    "question": "Regarding the cloud computing development timeline, which of the following statements is correct?",
     "options": [
       "VMware launched VMware Workstation in 2003, the same year the Xen project launched version 1.0.",
       "In 2006, Google CEO Eric Schmidt first proposed the concept of 'cloud computing' at the Search Engine Strategies Conference & Expo, and Amazon provided EC2, S3, SimpleDB and other cloud services in the form of web services.",
@@ -256,7 +256,7 @@
     "id": "intro-16",
     "section": "Virtualization Introduction",
     "format": "single",
-    "question": "Among the industry-cloud examples enumerated under the 'Four deployment models of cloud computing' slide, which of the following choices matches the slide exactly?",
+    "question": "Among the industry-cloud examples under the four deployment models of cloud computing, which of the following choices is correct?",
     "options": [
       "Industry cloud, Financial cloud, Medical cloud, Education cloud, Government cloud, Traffic cloud",
       "Industry cloud, Financial cloud, Medical cloud, Manufacturing cloud, Government cloud, Traffic cloud",
@@ -266,29 +266,29 @@
     "correctIndices": [
       0
     ],
-    "explanation": "The 'Four deployment models' slide enumerates exactly Industry cloud, Financial cloud, Medical cloud, Education cloud, Government cloud and Traffic cloud. Manufacturing, Telecom, Logistics, Retail and Energy are not on the listed set."
+    "explanation": "The industry-cloud examples are exactly Industry cloud, Financial cloud, Medical cloud, Education cloud, Government cloud and Traffic cloud. Manufacturing, Telecom, Logistics, Retail and Energy are not part of the set."
   },
   {
     "id": "intro-17",
     "section": "Virtualization Introduction",
     "format": "negative",
-    "question": "Among the following descriptions of the 'Products and solutions of cloud computing' slide, which one is incorrect?",
+    "question": "Among the following descriptions of cloud computing products and solutions, which one is incorrect?",
     "options": [
-      "CRM is shown at the SaaS layer of the slide.",
-      "Azure, CloudSystem and Intercloud are shown in the cloud-service area of the slide.",
-      "H3Cloud, BlueCloud and FusionSphere are listed at the cloud infrastructure / IaaS layer.",
-      "OpenStack and Kubernetes are explicitly shown as the only two products on the slide."
+      "CRM is positioned at the SaaS layer.",
+      "Azure, CloudSystem and Intercloud belong to the cloud-service area.",
+      "H3Cloud, BlueCloud and FusionSphere belong to the cloud infrastructure / IaaS layer.",
+      "OpenStack and Kubernetes are the only two products in this category."
     ],
     "correctIndices": [
       3
     ],
-    "explanation": "The 'Products and solutions of cloud computing' slide enumerates CRM at SaaS, App Engine and EC2 at the PaaS/IaaS layer, Azure, CloudSystem and Intercloud in the Cloud service area, and H3Cloud, BlueCloud and FusionSphere at the cloud infrastructure / IaaS layer. OpenStack and Kubernetes do not appear on this slide."
+    "explanation": "Cloud computing products and solutions place CRM at SaaS, App Engine and EC2 at the PaaS/IaaS layer, Azure, CloudSystem and Intercloud in the Cloud service area, and H3Cloud, BlueCloud and FusionSphere at the cloud infrastructure / IaaS layer. OpenStack and Kubernetes are not part of this categorization."
   },
   {
     "id": "intro-18",
     "section": "Virtualization Introduction",
     "format": "multi",
-    "question": "Which of the following statements about the three backup-solution options in the CAS 'Backup solution' slide are correct?",
+    "question": "Which of the following statements about the three CAS backup-solution options are correct?",
     "options": [
       "Mgmt. Platform Backup uses a backup server that mounts to the CVM over the management network to back up management data.",
       "CAS native backup has no additional cost but only supports VM backup and not database or file backup.",
@@ -301,13 +301,13 @@
       1,
       2
     ],
-    "explanation": "The 'Backup solution' slide describes three options: Mgmt. Platform Backup mounts a backup server to CVM over the management network for management-data backup; CAS native backup has no additional cost but is limited to VM backup (no DB/file), low rate, and no deduplication/compression/encryption; third-party backup (AISHOO, DataVault) docks with the CAS snapshot interface and supports high-rate database and file backup with advanced features. Options D and E contradict these descriptions."
+    "explanation": "There are three backup options: Mgmt. Platform Backup mounts a backup server to CVM over the management network for management-data backup; CAS native backup has no additional cost but is limited to VM backup (no DB/file), low rate, and no deduplication/compression/encryption; third-party backup (AISHOO, DataVault) docks with the CAS snapshot interface and supports high-rate database and file backup with advanced features. Options D and E contradict these descriptions."
   },
   {
     "id": "intro-19",
     "section": "Virtualization Introduction",
     "format": "single",
-    "question": "According to the 'Products compared with VMWare' slide, which CAS / H3C component maps to vCenter and ESXi respectively?",
+    "question": "When comparing CAS / H3C components against VMware products, which CAS / H3C component maps to vCenter and ESXi respectively?",
     "options": [
       "CVK maps to vCenter and CVM maps to ESXi.",
       "CVM maps to vCenter and CVK maps to ESXi.",
@@ -317,13 +317,13 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The 'Products compared with VMWare' slide pairs CAS CVM with vCenter (management) and CAS CVK with ESXi (hypervisor host), while ONEStor pairs with vSAN, SDN/NFV/UIS-Sec with NSX and CloudOS/UIS-Cloud with the vRealize Suite."
+    "explanation": "CAS CVM corresponds to vCenter (management) and CAS CVK corresponds to ESXi (hypervisor host). ONEStor corresponds to vSAN, SDN/NFV/UIS-Sec corresponds to NSX, and CloudOS/UIS-Cloud corresponds to the vRealize Suite."
   },
   {
     "id": "intro-20",
     "section": "Virtualization Introduction",
     "format": "multi",
-    "question": "Which of the following capabilities are listed under '01|Resource manageability-overview' in the course?",
+    "question": "Which of the following capabilities belong to the Resource manageability overview of CAS?",
     "options": [
       "Create VM in two steps",
       "Dynamic resource scheduling",
@@ -337,7 +337,7 @@
       2,
       3
     ],
-    "explanation": "The Resource manageability overview slide lists Create VM in two steps, Dynamic resource scheduling, Dynamic power management, Affinity and non-affinity, Online/Offline migration, plus VM Group and Adjustment capability. ESXi co-management is not a listed item on this slide."
+    "explanation": "Resource manageability covers Create VM in two steps, Dynamic resource scheduling, Dynamic power management, Affinity and non-affinity, Online/Offline migration, plus VM Group and Adjustment capability. ESXi co-management is not part of this capability set."
   },
   {
     "id": "intro-21",
@@ -353,13 +353,13 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The GPU/vGPU slide states virtual machines can automatically allocate and release GPU/vGPU resources according to policies, contradicting option D. The listed GPU and vGPU models in B and C match the slide, as does the exclusive/priority-preemption capability in A."
+    "explanation": "Virtual machines can automatically allocate and release GPU/vGPU resources according to policies, contradicting option D. The GPU and vGPU models listed in B and C are correct, as is the exclusive/priority-preemption capability in A."
   },
   {
     "id": "intro-22",
     "section": "Virtualization Introduction",
     "format": "multi",
-    "question": "Which of the following components or services are explicitly shown between the Active and Standby CVMs in the CAS high reliability architecture diagram?",
+    "question": "Which of the following components or services exist between the Active and Standby CVMs in the CAS high reliability architecture?",
     "options": [
       "Main communication",
       "Hot standby service",
@@ -373,7 +373,7 @@
       2,
       3
     ],
-    "explanation": "The CAS high reliability architecture diagram pairs Active and Standby H3C CAS CVMs with Main communication, Hot standby service, Data exchange service (synchronize configuration changes to the database in real time) and a Host heartbeat message channel. There is no external S3 object replication service in the diagram."
+    "explanation": "The CAS high reliability architecture pairs Active and Standby H3C CAS CVMs with Main communication, Hot standby service, Data exchange service (synchronize configuration changes to the database in real time) and a Host heartbeat message channel. There is no external S3 object replication service involved."
   },
   {
     "id": "intro-23",
@@ -391,13 +391,13 @@
       2,
       4
     ],
-    "explanation": "The security architecture slide explicitly labels the distributed dual-stack virtual firewall, antivirus and intrusion detection/prevention as agentless under the service-diversification pillar, so option C (calling the firewall agent-based) and option E (denying the agentless antivirus/IDS are present) are both incorrect. Options A, B and D match the slide."
+    "explanation": "The security architecture slide explicitly labels the distributed dual-stack virtual firewall, antivirus and intrusion detection/prevention as agentless under the service-diversification pillar, so option C (calling the firewall agent-based) and option E (denying the agentless antivirus/IDS are present) are both incorrect. Options A, B and D are correct."
   },
   {
     "id": "intro-24",
     "section": "Virtualization Introduction",
     "format": "single",
-    "question": "Regarding '05|The Best Alternative to VMware virtualization' as presented in the course, which of the following statements is correct?",
+    "question": "Regarding '05|The Best Alternative to VMware virtualization', which of the following statements is correct?",
     "options": [
       "The CVM virtualization management platform can uniformly manage both VMware and CAS virtual machines, with One-Click Migration of VMware VMs to CAS and Seamless DR backup/restore of VMware VMs to CAS.",
       "VMware vCenter is required to remain the unified management plane and the CAS CVM is decommissioned during migration.",
@@ -407,13 +407,13 @@
     "correctIndices": [
       0
     ],
-    "explanation": "The slide states the CAS CVM management system provides Unified Management of VMware and CAS VMs, One-Click Migration of VMware VMs to CAS, and Seamless DR by backing up and restoring VMware VMs to CAS for data protection and emergency takeover."
+    "explanation": "The CAS CVM management system provides Unified Management of VMware and CAS VMs, One-Click Migration of VMware VMs to CAS, and Seamless DR by backing up and restoring VMware VMs to CAS for data protection and emergency takeover."
   },
   {
     "id": "intro-25",
     "section": "Virtualization Introduction",
     "format": "negative",
-    "question": "Among the following one-click capabilities, which is NOT listed under 'Scenario O&M' in the CAS operation and maintenance capability framework?",
+    "question": "Among the following one-click capabilities, which is NOT part of Scenario O&M in the CAS operation and maintenance capability framework?",
     "options": [
       "One-click health check",
       "One-click resources analyzation",
@@ -424,7 +424,7 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The 'Operation and maintenance capability framework' slide lists under Scenario O&M: One-click health check, One-click resources analyzation, One-click storage space clear, One-click resources statistics gathering, One-click VMs restore and One-click zombie VMs removed. There is no 'one-click hypervisor kernel recompile' item."
+    "explanation": "Scenario O&M covers One-click health check, One-click resources analyzation, One-click storage space clear, One-click resources statistics gathering, One-click VMs restore and One-click zombie VMs removed. There is no 'one-click hypervisor kernel recompile' capability."
   },
   {
     "id": "infra-01",
@@ -504,7 +504,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The Related concepts of link aggregation page defines the operation key as a configuration combination automatically generated by the aggregation control according to configurations of member ports during link aggregation."
+    "explanation": "The operation key is a configuration combination automatically generated by the aggregation control according to configurations of member ports during link aggregation."
   },
   {
     "id": "infra-06",
@@ -536,7 +536,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The Storage architecture--DAS slide states DAS storage devices are directly connected to the server through a cable (usually a SCSI interface cable), with I/O requests sent directly to the storage device, taking the server as the center."
+    "explanation": "DAS storage devices are directly connected to the server through a cable (usually a SCSI interface cable), with I/O requests sent directly to the storage device, taking the server as the center."
   },
   {
     "id": "infra-08",
@@ -552,7 +552,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The Working modes of NTP slide states broadcast and multicast modes are used when the IP address of the server or peer cannot be determined, or there are many devices to be synchronized on the network."
+    "explanation": "Broadcast and multicast NTP modes are used when the IP address of the server or peer cannot be determined, or when there are many devices to be synchronized on the network."
   },
   {
     "id": "infra-09",
@@ -568,7 +568,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The Basic ACL slide states the basic ACL only formulates rules based on information about the source IP address of the packet, and can be used to restrict host-to-host mutual access. Per the ACL identification table, the basic ACL serial range is 2000-2999, not 3000-3999."
+    "explanation": "The basic ACL only formulates rules based on information about the source IP address of the packet, and can be used to restrict host-to-host mutual access. The basic ACL serial range is 2000-2999, not 3000-3999."
   },
   {
     "id": "infra-10",
@@ -584,7 +584,7 @@
     "correctIndices": [
       2
     ],
-    "explanation": "The QoS rate limit page states LR introduces a queue buffer mechanism in a token bucket, thereby reducing the packet loss rate, smoothing the traffic, but also increasing the delay. LR is located at the link layer and applied only to the outgoing direction; QoS cannot create bandwidth."
+    "explanation": "LR introduces a queue buffer mechanism in a token bucket, thereby reducing the packet loss rate, smoothing the traffic, but also increasing the delay. LR is located at the link layer and applied only to the outgoing direction; QoS cannot create bandwidth."
   },
   {
     "id": "infra-11",
@@ -679,7 +679,7 @@
       1,
       2
     ],
-    "explanation": "The Link aggregation mode slide lists exactly: static does not exchange info, picks the reference port from local info, and creates/deletes the static group by user command; dynamic enables LACP. Both static and dynamic require a user command for create/delete, so D is wrong."
+    "explanation": "Static aggregation does not exchange information with the peer, picks the reference port from local information, and creates/deletes the static group via user command. Dynamic aggregation enables LACP. Both static and dynamic modes require a user command to create or delete the aggregation group, so D is wrong."
   },
   {
     "id": "infra-16",
@@ -697,7 +697,7 @@
       0,
       1
     ],
-    "explanation": "The Hot spare disk of RAID page lists exactly two types: Global hot spare disk (serves all RAID groups in the array) and Dedicated hot spare disk (only serves a specific RAID group). The other three are invented terms."
+    "explanation": "RAID has exactly two hot spare disk types: Global hot spare disk (serves all RAID groups in the array) and Dedicated hot spare disk (only serves a specific RAID group). The other three are invented terms."
   },
   {
     "id": "infra-17",
@@ -799,7 +799,7 @@
       3,
       4
     ],
-    "explanation": "The FC port type slide lists N_Port, F_Port, E_Port, and U_Port (general port that can be changed to E or F). Option D mis-defines U_Port; option E invents the term FCoE_Port and steals the U_Port definition."
+    "explanation": "The FC port types are N_Port, F_Port, E_Port, and U_Port (the general port that can be changed to E or F). Option D mis-defines U_Port; option E invents the term FCoE_Port and steals the U_Port definition."
   },
   {
     "id": "infra-23",
@@ -817,7 +817,7 @@
       3,
       4
     ],
-    "explanation": "The Comparison of storage protocols table shows: SCSI parallel 320 MB/s (A correct); FC serial with FC switches and FC HBA, compatibility poor (B correct, D wrong because FC needs FC switches and FC HBAs, not Ethernet); iSCSI Ethernet switch/router 20 Gb/s (C correct); SCSI compatibility is rated Good in the table, not poor (E wrong)."
+    "explanation": "The Comparison of storage protocols table shows: SCSI parallel 320 MB/s (A correct); FC serial with FC switches and FC HBA, compatibility poor (B correct, D wrong because FC needs FC switches and FC HBAs, not Ethernet); iSCSI Ethernet switch/router 20 Gb/s (C correct); SCSI compatibility is rated Good, not poor (E wrong)."
   },
   {
     "id": "infra-24",
@@ -865,7 +865,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The Key parameters of CPU page states the L1 Cache (first-level cache) is composed of static RAMs and is divided into the data cache (L1d Cache) and the instruction cache (L1i Cache), with the highest speed and smaller capacity, usually 32-256 K. The 10 M or more capacity describes L3 Cache; the half-main-frequency speed describes the external-chip L2 Cache."
+    "explanation": "The L1 Cache (first-level cache) is composed of static RAMs and is divided into the data cache (L1d Cache) and the instruction cache (L1i Cache), with the highest speed and smaller capacity, usually 32-256 K. The 10 M or more capacity describes L3 Cache; the half-main-frequency speed describes the external-chip L2 Cache."
   },
   {
     "id": "infra-27",
@@ -929,7 +929,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The Comparison of UEFI and Legacy BIOS page states UEFI GPT is limited to 9.4 ZB and BIOS MBR is limited to 2.2 TB."
+    "explanation": "UEFI GPT is limited to 9.4 ZB and BIOS MBR is limited to 2.2 TB."
   },
   {
     "id": "infra-31",
@@ -945,7 +945,7 @@
     "correctIndices": [
       0
     ],
-    "explanation": "The DHCP lease renewal page shows the first renewal request is sent when use time reaches 50% of the lease term, with another at 87.5% of the lease term if the first is not acknowledged."
+    "explanation": "The DHCP client sends its first renewal request when use time reaches 50% of the lease term, with another at 87.5% of the lease term if the first is not acknowledged."
   },
   {
     "id": "infra-32",
@@ -977,7 +977,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The FC address page states the fixed address (WWN) is 64-bit, defined by the vendor in IEEE format, while the dynamic address is 8/24-bit, locally generated, dynamically obtained when registering to the fiber channel network."
+    "explanation": "The fixed address (WWN) is 64-bit, defined by the vendor in IEEE format, while the dynamic address is 8/24-bit, locally generated, dynamically obtained when registering to the fiber channel network."
   },
   {
     "id": "infra-34",
@@ -993,7 +993,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The Storage architecture--NAS page defines NAS as connecting the storage device to the existing network to provide data and file services, and supporting network file sharing protocols CIFS and NFS. Block-mode access is SAN (FC SAN or IP SAN), not NAS."
+    "explanation": "NAS connects the storage device to the existing network to provide data and file services, and supports network file sharing protocols CIFS and NFS. Block-mode access is SAN (FC SAN or IP SAN), not NAS."
   },
   {
     "id": "infra-35",
@@ -1019,7 +1019,7 @@
     "id": "infra-36",
     "section": "Virtualized Infrastructure",
     "format": "multi",
-    "question": "Which of the following are listed advantages of the SSD hard disk?",
+    "question": "Which of the following are advantages of the SSD hard disk?",
     "options": [
       "High data access speed.",
       "Shock-proof, drop-proof.",
@@ -1033,13 +1033,13 @@
       2,
       3
     ],
-    "explanation": "The SSD hard disk page lists Advantages as: high data access speed, shock-proof/drop-proof, no noise/low heat, wide operating temperature range, low weight. 'Limited write life' is explicitly listed as a Disadvantage, not unlimited."
+    "explanation": "SSD advantages include high data access speed, shock-proof/drop-proof, no noise/low heat, wide operating temperature range, and low weight. Limited write life is a disadvantage of SSDs, not an advantage."
   },
   {
     "id": "infra-37",
     "section": "Virtualized Infrastructure",
     "format": "multi",
-    "question": "Which of the following are DHCP address assignment modes specified in the DHCP introduction?",
+    "question": "Which of the following are valid DHCP address assignment modes?",
     "options": [
       "Manual assignment, where the administrator binds fixed IP addresses to specific hosts.",
       "Automatic assignment, where the host uses the address for a long time after assignment.",
@@ -1052,7 +1052,7 @@
       1,
       2
     ],
-    "explanation": "The DHCP address assignment mode page lists exactly three: Manual assignment, Automatic assignment, and Dynamic assignment. 'Stateful relay' and 'Reservation' are not modes defined in the PDF."
+    "explanation": "DHCP has exactly three address assignment modes: Manual assignment, Automatic assignment, and Dynamic assignment. 'Stateful relay' and 'Reservation' are not defined DHCP assignment modes."
   },
   {
     "id": "infra-38",
@@ -1071,7 +1071,7 @@
       1,
       2
     ],
-    "explanation": "The QoS functions slide lists congestion avoidance, packet-loss reduction, bandwidth management when congested, traffic regulation, dedicated bandwidth, and real-time support. It explicitly states QoS cannot create bandwidth, only allocate it more reasonably. The QoS LR slide places LR at the link layer (not network layer) and applies it only to the outgoing direction (not incoming)."
+    "explanation": "QoS supports congestion avoidance, packet-loss reduction, bandwidth management when congested, traffic regulation, dedicated bandwidth, and real-time services. QoS cannot create bandwidth, only allocate it more reasonably. QoS LR is at the link layer (not network layer) and applies only to the outgoing direction (not incoming)."
   },
   {
     "id": "infra-39",
@@ -1091,7 +1091,7 @@
       2,
       3
     ],
-    "explanation": "The RAID advantage--Increase capacity page lists: RAID 0 capacity n x c, RAID 1 capacity c, RAID 5 capacity (n-1) x c, RAID 6 capacity (n-2) x c, RAID 10 capacity (n/2) x c. Option E omits the mirroring loss."
+    "explanation": "RAID 0 capacity is n x c, RAID 1 capacity is c, RAID 5 capacity is (n-1) x c, RAID 6 capacity is (n-2) x c, and RAID 10 capacity is (n/2) x c. Option E omits the mirroring loss."
   },
   {
     "id": "infra-40",
@@ -1117,7 +1117,7 @@
     "id": "infra-41",
     "section": "Virtualized Infrastructure",
     "format": "multi",
-    "question": "Which of the following statements about NTP and snapshot in the PDF are correct?",
+    "question": "Which of the following statements about NTP and snapshot are correct?",
     "options": [
       "NTP is used to perform clock synchronization on devices on the network.",
       "Typical NTP applications include log information records, debugging records, accounting systems, and cooperative processing of multiple systems.",
@@ -1130,7 +1130,7 @@
       1,
       2
     ],
-    "explanation": "The Introduction to NTP page lists clock-sync purpose plus the typical applications listed in option B. The Definition/values of snapshot page lists option C verbatim. The NTP verification page does not restrict password verification to broadcast mode, and SNIA defines snapshot as a fully available copy at a specific time point (not partial)."
+    "explanation": "NTP performs clock synchronization on networked devices, with typical applications such as log information records, debugging records, accounting systems, and cooperative processing of multiple systems. Snapshot values include quick backup/restore, storing multiple recovery point objectives, and redefining data usage. NTP password verification is not restricted to broadcast mode, and SNIA defines a snapshot as a fully available copy at a specific time point (not partial)."
   },
   {
     "id": "infra-42",
@@ -1183,7 +1183,7 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The Storage performance index page states: writing one 1 MB file takes 0.1 s, bandwidth = 10 MB/s and IOPS = 10; in this case, bandwidth (not IOPS) has a high possibility of becoming the bottleneck."
+    "explanation": "Writing one 1 MB file takes 0.1 s with bandwidth = 10 MB/s and IOPS = 10; in this case, bandwidth (not IOPS) has a high possibility of becoming the bottleneck."
   },
   {
     "id": "infra-45",
@@ -1199,7 +1199,7 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The Link aggregation type page states Layer 3 link aggregation requires all member ports to be Layer 3 Ethernet ports, not Layer 2. The other three options match the page text."
+    "explanation": "Layer 3 link aggregation requires all member ports to be Layer 3 Ethernet ports, not Layer 2. The other three options are correct."
   },
   {
     "id": "infra-46",
@@ -1215,7 +1215,7 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The SCSI limitations page lists 6 m single-ended, 25 m differential, and only 8 or 16 SCSI bus addresses. The Comparison of storage protocols table lists the SCSI current maximum rate as 320 MB/s; 20 Gb/s is the iSCSI maximum rate."
+    "explanation": "SCSI limitations include 6 m single-ended distance, 25 m differential distance, and only 8 or 16 SCSI bus addresses. The SCSI current maximum rate is 320 MB/s; 20 Gb/s is the iSCSI maximum rate."
   },
   {
     "id": "infra-47",
@@ -1249,7 +1249,7 @@
       2,
       4
     ],
-    "explanation": "The Introduction to server power supply page states that for redundant power supplies, when one fails the other immediately takes over (no shutdown needed). The RAID reconstruction page states reconstruction is performed without affecting system operation and is triggered automatically when a hot spare or replacement disk is detected, not by manual block-by-block copy."
+    "explanation": "For redundant power supplies, when one fails the other immediately takes over (no shutdown needed). RAID reconstruction is performed without affecting system operation and is triggered automatically when a hot spare or replacement disk is detected, not by manual block-by-block copy."
   },
   {
     "id": "infra-49",
@@ -1267,7 +1267,7 @@
       3,
       4
     ],
-    "explanation": "The iSCSI packet format page shows the PDU is carried over TCP (port 3260), not UDP, and shows port 3260 in the destination-port field of the connecting frame; UDP encapsulation is not used. Options A, B, C are correct per the iSCSI workflow/packet format page."
+    "explanation": "iSCSI PDUs are carried over TCP (port 3260), not UDP, and port 3260 appears in the destination-port field of the connecting frame; UDP encapsulation is not used. Options A, B, C are correct."
   },
   {
     "id": "infra-50",
@@ -1285,7 +1285,7 @@
       3,
       4
     ],
-    "explanation": "The System composition of DHCP page defines the DHCP server as a server or network device that provides the DHCP function (not exclusively a dedicated appliance), and defines the DHCP client as a host that needs to dynamically obtain an IP (no static pre-configuration). NTP verification statements A/B match the NTP verification page, and the relay statement C matches the DHCP composition page."
+    "explanation": "The DHCP server can be any server or network device that provides the DHCP function (not exclusively a dedicated appliance), and the DHCP client is any host that needs to dynamically obtain an IP (no static pre-configuration). NTP verification statements A/B are correct, and the relay statement C is correct."
   },
   {
     "id": "deploy-01",
@@ -1317,7 +1317,7 @@
     "correctIndices": [
       0
     ],
-    "explanation": "The PDF states H3C CAS is a hardware-assisted virtualization system requiring Intel-VT or AMD-V on x86, and ARM VHE virtualization extension on ARM-based servers."
+    "explanation": "H3C CAS is a hardware-assisted virtualization system requiring Intel-VT or AMD-V on x86, and ARM VHE virtualization extension on ARM-based servers."
   },
   {
     "id": "deploy-03",
@@ -1349,7 +1349,7 @@
     "correctIndices": [
       2
     ],
-    "explanation": "The PDF states the default user name and password for the H3C CAS login interface are admin/Cloud@1234."
+    "explanation": "The default user name and password for the H3C CAS login interface are admin/Cloud@1234."
   },
   {
     "id": "deploy-05",
@@ -1365,7 +1365,7 @@
     "correctIndices": [
       0
     ],
-    "explanation": "The manual partition step instructs adding /, /boot/efi, /boot, swap, /vms, and /var/log partitions in turn."
+    "explanation": "Partition step instructs adding /, /boot/efi, /boot, swap, /vms, and /var/log partitions in turn."
   },
   {
     "id": "deploy-06",
@@ -1381,7 +1381,7 @@
     "correctIndices": [
       2
     ],
-    "explanation": "The PDF states NTP is enabled by default after install, and recommends CVM as NTP server with CVK as NTP clients; virtual IPs are used in hot standby environments."
+    "explanation": "NTP is enabled by default after install, and recommends CVM as NTP server with CVK as NTP clients; virtual IPs are used in hot standby environments."
   },
   {
     "id": "deploy-07",
@@ -1417,7 +1417,7 @@
       2,
       4
     ],
-    "explanation": "The PDF specifies <4 HA clusters per host pool, <32 CVK hosts per HA cluster, storage volume <64TB, <10 shared file systems per cluster, and a shared file system can be simultaneously used by at most 32 hosts (not 64) and only in one cluster."
+    "explanation": "<4 HA clusters per host pool, <32 CVK hosts per HA cluster, storage volume <64TB, <10 shared file systems per cluster, and a shared file system can be simultaneously used by at most 32 hosts (not 64) and only in one cluster."
   },
   {
     "id": "deploy-09",
@@ -1528,7 +1528,7 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The PDF note states that if migration and backup networks are not specified, they share the MANAGEMENT network (not storage), and therefore the management network is recommended to be 10 GB."
+    "explanation": "States that if migration and backup networks are not specified, they share the MANAGEMENT network (not storage), and therefore the management network is recommended to be 10 GB."
   },
   {
     "id": "deploy-15",
@@ -1544,7 +1544,7 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The host information file is named host.info (not host.cfg) and is downloaded via the CAS Product Registration dialog box - there is no auto-generated /etc/cvm/host.cfg path in the PDF."
+    "explanation": "The host information file is named host.info (not host.cfg) and is downloaded via the CAS Product Registration dialog box - there is no auto-generated /etc/cvm/host.cfg path."
   },
   {
     "id": "deploy-16",
@@ -1578,7 +1578,7 @@
       2,
       4
     ],
-    "explanation": "The documented order is: Install CVM/CVK OS, set time, log in to CAS, configure hot standby (optional), register license, create host pool/cluster, add host, configure vSwitch, configure storage pool. There is no HDM agent install step and no mandatory iLO firmware flash step in the PDF."
+    "explanation": "The standard order is: Install CVM/CVK OS, set time, log in to CAS, configure hot standby (optional), register license, create host pool/cluster, add host, configure vSwitch, configure storage pool. There is no HDM agent install step and no mandatory iLO firmware flash step."
   },
   {
     "id": "deploy-18",
@@ -1587,7 +1587,7 @@
     "question": "Regarding CAStools installation on a VM, which of the following statements are incorrect?",
     "options": [
       "After the VM is installed, the H3C CAS platform cannot obtain VM CPU and memory utilization information without CAStools",
-      "For Linux VMs, run ./CAS_tools_install.sh after mounting the CD-ROM and entering the Linux directory of CAStools",
+      "For Linux VMs, run./CAS_tools_install.sh after mounting the CD-ROM and entering the Linux directory of CAStools",
       "For Windows VMs, after CAStools setup completes, the high-speed NIC driver is also loaded",
       "After CAStools is installed, the CD-ROM should remain permanently connected for ongoing monitoring",
       "Installing CAStools on the Linux VM only requires executing the rpm -ivh castools.rpm command from /root"
@@ -1596,7 +1596,7 @@
       3,
       4
     ],
-    "explanation": "PDF says after CAStools installation, click Disconnect on the CD-ROM page (not keep permanently connected), and the Linux install command is ./CAS_tools_install.sh from the Linux directory of CAStools, not an rpm install from /root."
+    "explanation": "PDF says after CAStools installation, click Disconnect on the CD-ROM page (not keep permanently connected), and the Linux install command is./CAS_tools_install.sh from the Linux directory of CAStools, not an rpm install from /root."
   },
   {
     "id": "deploy-19",
@@ -1628,7 +1628,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF states the startup mode should be set to UEFI and the boot item to 'start from the image'."
+    "explanation": "The startup mode should be set to UEFI and the boot item to 'start from the image'."
   },
   {
     "id": "deploy-21",
@@ -1692,7 +1692,7 @@
     "correctIndices": [
       0
     ],
-    "explanation": "The PDF specifies the format date xxxxxxxxxx where the digits indicate month, day, hour, minute, year. For 14:29 on Sept 30, 2012 the command is exactly date 0930142912."
+    "explanation": "The format date xxxxxxxxxx where the digits indicate month, day, hour, minute, year. For 14:29 on Sept 30, 2012 the command is exactly date 0930142912."
   },
   {
     "id": "deploy-25",
@@ -1724,7 +1724,7 @@
     "correctIndices": [
       2
     ],
-    "explanation": "The PDF example uses the storage network address 192.168.12.0 in the Shared File System Heartbeat Network dialog box."
+    "explanation": "CAS example uses the storage network address 192.168.12.0 in the Shared File System Heartbeat Network dialog box."
   },
   {
     "id": "deploy-27",
@@ -1859,7 +1859,7 @@
     "correctIndices": [
       3
     ],
-    "explanation": "PDF explicitly recommends active-standby load sharing or basic load sharing and NOT recommends advanced load sharing - option D is the opposite of the documented recommendation. Options A and B match the Switch planning table; option C is the explicit PDF note."
+    "explanation": "PDF explicitly recommends active-standby load sharing or basic load sharing and NOT recommends advanced load sharing - option D is the opposite of the standard recommendation. Options A and B match the Switch planning table; option C is the explicit PDF note."
   },
   {
     "id": "deploy-34",
@@ -1900,16 +1900,16 @@
     "question": "Among the following descriptions of CAStools VM installation for Windows and Linux, which statements are incorrect?",
     "options": [
       "For Windows, double-click the virtual CD-ROM and follow the CAStools Setup wizard",
-      "For Linux, mount the CD-ROM, enter the Linux directory of CAStools and run ./CAS_tools_install.sh",
+      "For Linux, mount the CD-ROM, enter the Linux directory of CAStools and run./CAS_tools_install.sh",
       "After CAStools is installed, click the Disconnect button on the CD-ROM page of the Modify VM dialog box",
       "CAStools is installed via the BIOS Setup menu by pressing F2 during VM boot",
-      "For Linux, CAStools is delivered as a .deb package that requires dpkg -i to install"
+      "For Linux, CAStools is delivered as a.deb package that requires dpkg -i to install"
     ],
     "correctIndices": [
       3,
       4
     ],
-    "explanation": "Options A, B, C are exact PDF instructions. CAStools is NOT installed via BIOS F2 menu, and the Linux install is ./CAS_tools_install.sh from the mounted CD-ROM Linux directory, not a dpkg .deb package."
+    "explanation": "Options A, B, C are exact PDF instructions. CAStools is NOT installed via BIOS F2 menu, and the Linux install is./CAS_tools_install.sh from the mounted CD-ROM Linux directory, not a dpkg.deb package."
   },
   {
     "id": "deploy-37",
@@ -1925,7 +1925,7 @@
     "correctIndices": [
       3
     ],
-    "explanation": "PDF service server hardware table shows 4 NICs for both 'No external storage' and 'Use FC storage' across two-/four-/eight-path configurations, and 6 NICs for 'Use IP storage'. 8 NICs is not in the table."
+    "explanation": "PDF service server hardware table shows 4 NICs for both 'No external storage' and 'Use FC storage' across two-/four-/eight-path configurations, and 6 NICs for 'Use IP storage'. 8 NICs is not."
   },
   {
     "id": "deploy-38",
@@ -1958,7 +1958,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "Per the PDF, a host pool is a collection of a series of hosts and clusters, and the host can be added to the host pool or the cluster. The cluster is a computing resource collection composed of physical hosts and VMs."
+    "explanation": "A host pool is a collection of a series of hosts and clusters, and the host can be added to the host pool or the cluster. The cluster is a computing resource collection composed of physical hosts and VMs."
   },
   {
     "id": "basic-02",
@@ -1990,7 +1990,7 @@
     "correctIndices": [
       2
     ],
-    "explanation": "The PDF describes the balloon driver as installed in CAStools in the guest OS to reclaim memory and, through balloon expansion, release free memory in the VM to another VM needing more memory on the same host. Option A describes transparent page sharing; B describes memory swapping; D contradicts the in-VM CAStools placement."
+    "explanation": "The balloon driver as installed in CAStools in the guest OS to reclaim memory and, through balloon expansion, release free memory in the VM to another VM needing more memory on the same host. Option A describes transparent page sharing; B describes memory swapping; D contradicts the in-VM CAStools placement."
   },
   {
     "id": "basic-04",
@@ -2540,7 +2540,7 @@
     "id": "basic-36",
     "section": "Basic Functions",
     "format": "multi",
-    "question": "Which of the following functions of CAS Tools (the agent installed inside the VM) are described in the source?",
+    "question": "Which of the following functions are performed by CAS Tools (the agent installed inside the VM)?",
     "options": [
       "Monitor information such as CPU, memory, disk utilization, and NIC traffic",
       "Uniformly manage VM operating system parameters such as VM IP address, account, and password",
@@ -2554,7 +2554,7 @@
       2,
       3
     ],
-    "explanation": "PDF: CAS Tools monitors VM (CPU/mem/disk/NIC), uniformly manages OS parameters (IP/account/password), provides VM time synchronization, VM shutdown, and installs the Virtio device driver. Disk encryption is performed by the CVK kernel module, not by CAS Tools."
+    "explanation": "CAS Tools monitors VM resources (CPU/memory/disk/NIC), uniformly manages OS parameters (IP/account/password), provides VM time synchronization, VM shutdown, and installs the Virtio device driver. Disk encryption is performed by the CVK kernel module, not by CAS Tools."
   },
   {
     "id": "basic-37",
@@ -2821,7 +2821,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF states: 'The hot standby system consists of three entities: an active node, a standby node, and an arbitration node.'"
+    "explanation": "CAS states: 'The hot standby system consists of three entities: an active node, a standby node, and an arbitration node.'"
   },
   {
     "id": "advanced-02",
@@ -2837,7 +2837,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF states the hot standby data synchronization 'is implemented by using the DRBD storage replication solution.'"
+    "explanation": "The hot standby data synchronization 'is implemented by using the DRBD storage replication solution.'"
   },
   {
     "id": "advanced-03",
@@ -2853,7 +2853,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF states: 'The HA failure detection mechanism is based on whether the CVK host can normally access the shared storage pool connected to the CVK host.'"
+    "explanation": "CAS states: 'The HA failure detection mechanism is based on whether the CVK host can normally access the shared storage pool connected to the CVK host.'"
   },
   {
     "id": "advanced-04",
@@ -2869,7 +2869,7 @@
     "correctIndices": [
       2
     ],
-    "explanation": "The PDF states: 'If the restart fails, after three consecutive detection cycles, a message is reported to the CVM management node to migrate the VM.'"
+    "explanation": "CAS states: 'If the restart fails, after three consecutive detection cycles, a message is reported to the CVM management node to migrate the VM.'"
   },
   {
     "id": "advanced-05",
@@ -2885,7 +2885,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF states FT 'is technology for virtual machines failures switching, truly achieving continuous availability of applications' with 'No business downtime and No storage loss.'"
+    "explanation": "FT 'is technology for virtual machines failures switching, truly achieving continuous availability of applications' with 'No business downtime and No storage loss.'"
   },
   {
     "id": "advanced-06",
@@ -2901,7 +2901,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF states 'each I/O write operation is released only after both the master volume and the remote volume having the replication relationship return that the write operations are completed.'"
+    "explanation": "'each I/O write operation is released only after both the master volume and the remote volume having the replication relationship return that the write operations are completed.'"
   },
   {
     "id": "advanced-07",
@@ -2917,7 +2917,7 @@
     "correctIndices": [
       0
     ],
-    "explanation": "The PDF states SR-IOV 'virtualize[s] a single physical NIC into multiple VF interfaces. Each VF interface has a separate virtual PCIe channel... so that the VM can directly access its own VF interface without the coordinated intervention of the hypervisor.'"
+    "explanation": "SR-IOV 'virtualize[s] a single physical NIC into multiple VF interfaces. Each VF interface has a separate virtual PCIe channel.. so that the VM can directly access its own VF interface without the coordinated intervention of the hypervisor.'"
   },
   {
     "id": "advanced-08",
@@ -2933,7 +2933,7 @@
     "correctIndices": [
       2
     ],
-    "explanation": "The PDF states the balloon driver 'reclaim[s] the memory, and release[s], through expansion of the balloon driver, the free memory in the VM to a VM that needs more memory on the same host.'"
+    "explanation": "The balloon driver 'reclaim[s] the memory, and release[s], through expansion of the balloon driver, the free memory in the VM to a VM that needs more memory on the same host.'"
   },
   {
     "id": "advanced-09",
@@ -2949,7 +2949,7 @@
     "correctIndices": [
       0
     ],
-    "explanation": "The PDF states for the Active-Active Stretched Cluster: 'Make sure the distance between two DCs is not longer than 5 km (3.11 miles) and the network latency is not longer than 1ms.'"
+    "explanation": "For the Active-Active Stretched Cluster: 'Make sure the distance between two DCs is not longer than 5 km (3.11 miles) and the network latency is not longer than 1ms.'"
   },
   {
     "id": "advanced-10",
@@ -2965,7 +2965,7 @@
     "correctIndices": [
       0
     ],
-    "explanation": "The PDF states for computing and network DRS: 'Monitoring content includes the host memory, the CPU, and the network traffic.'"
+    "explanation": "For computing and network DRS: 'Monitoring content includes the host memory, the CPU, and the network traffic.'"
   },
   {
     "id": "advanced-11",
@@ -2984,7 +2984,7 @@
       1,
       2
     ],
-    "explanation": "The PDF lists HA access control items as: minimum number of effective nodes, failover host, and HA resource reservation."
+    "explanation": "HA access control items as: minimum number of effective nodes, failover host, and HA resource reservation."
   },
   {
     "id": "advanced-12",
@@ -3003,7 +3003,7 @@
       2,
       3
     ],
-    "explanation": "The PDF DPM policy section lists all four prerequisites verbatim."
+    "explanation": "CAS DPM policy section lists all four prerequisites verbatim."
   },
   {
     "id": "advanced-13",
@@ -3022,7 +3022,7 @@
       1,
       2
     ],
-    "explanation": "The PDF Application HA configuration page lists exactly these three prerequisites: HA enabled on cluster, CASTools installed in the VM OS, and application compatibility verified."
+    "explanation": "Application HA configuration requires exactly these three prerequisites: HA enabled on the cluster, CASTools installed in the VM OS, and application compatibility verified."
   },
   {
     "id": "advanced-14",
@@ -3042,7 +3042,7 @@
       2,
       3
     ],
-    "explanation": "The PDF lists exactly these four VMs-to-Hosts relationships: Must Run, Should Run, Must Not Run, Should Not Run."
+    "explanation": "Exactly these four VMs-to-Hosts relationships: Must Run, Should Run, Must Not Run, Should Not Run."
   },
   {
     "id": "advanced-15",
@@ -3061,7 +3061,7 @@
       1,
       2
     ],
-    "explanation": "The PDF asynchronous replication section explicitly states (1) periodic execution without guaranteed consistency, (2) snapshot-then-replicate principle, and (3) low bandwidth/distance requirements."
+    "explanation": "CAS asynchronous replication section explicitly states (1) periodic execution without guaranteed consistency, (2) snapshot-then-replicate principle, and (3) low bandwidth/distance requirements."
   },
   {
     "id": "advanced-16",
@@ -3078,7 +3078,7 @@
       0,
       1
     ],
-    "explanation": "The PDF host wakeup section lists exactly two methods: Network wakeup (configured via BIOS Wake-On LAN) and IPMI wakeup (IPMI command to BMC)."
+    "explanation": "CAS host wakeup section lists exactly two methods: Network wakeup (configured via BIOS Wake-On LAN) and IPMI wakeup (IPMI command to BMC)."
   },
   {
     "id": "advanced-17",
@@ -3098,7 +3098,7 @@
       2,
       3
     ],
-    "explanation": "The PDF VM affinity rule configuration page lists exactly these four statements."
+    "explanation": "VM affinity rule configuration supports exactly these four statements."
   },
   {
     "id": "advanced-18",
@@ -3114,7 +3114,7 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The PDF defines the network heartbeat as a check over the management network, not via BMC/IPMI; IPMI is only used for DPM host wakeup."
+    "explanation": "The network heartbeat as a check over the management network, not via BMC/IPMI; IPMI is only used for DPM host wakeup."
   },
   {
     "id": "advanced-19",
@@ -3162,7 +3162,7 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The PDF SRM section describes RPO at minute level using asynchronous remote replication, not RPO=0 with synchronous replication. RPO=0 is the property of the Active-Active Stretched Cluster solution, not SRM."
+    "explanation": "CAS SRM section describes RPO at minute level using asynchronous remote replication, not RPO=0 with synchronous replication. RPO=0 is the property of the Active-Active Stretched Cluster solution, not SRM."
   },
   {
     "id": "advanced-22",
@@ -3198,7 +3198,7 @@
       3,
       4
     ],
-    "explanation": "The PDF explicitly states the failover host group 'cannot be used as the destination host for adding or migrating the VM', so option 3 contradicts it. There is no FT-pair-creation behavior tied to HA resource reservation in the source."
+    "explanation": "The failover host group 'cannot be used as the destination host for adding or migrating the VM', so option 3 contradicts it. There is no FT-pair-creation behavior tied to HA resource reservation in the source."
   },
   {
     "id": "advanced-24",
@@ -3216,7 +3216,7 @@
       3,
       4
     ],
-    "explanation": "The PDF explicitly requires the remote CVM version to be the same as the local CVM, contradicting option 3. SR-IOV passthrough is not listed as a cloud rainbow prerequisite anywhere in the source."
+    "explanation": "CAS explicitly requires the remote CVM version to be the same as the local CVM, contradicting option 3. SR-IOV passthrough is not listed as a cloud rainbow prerequisite anywhere in the source."
   },
   {
     "id": "advanced-25",
@@ -3232,7 +3232,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF NUMA page states 'The local memory is preferentially allocated' and 'The insufficient section is allocated from the remote end' with smaller delay and greater bandwidth on local access."
+    "explanation": "With NUMA, local memory is preferentially allocated, and any insufficient section is allocated from the remote end, with smaller delay and greater bandwidth on local access."
   },
   {
     "id": "advanced-26",
@@ -3248,7 +3248,7 @@
     "correctIndices": [
       2
     ],
-    "explanation": "The PDF memory over-commit page describes memory swapping as 'Swap the memory that the VM has not used for a long time to a disk file, and establish a mapping relationship; and swap the memory back when the memory is accessed again.'"
+    "explanation": "CAS memory over-commit page describes memory swapping as 'Swap the memory that the VM has not used for a long time to a disk file, and establish a mapping relationship; and swap the memory back when the memory is accessed again.'"
   },
   {
     "id": "advanced-27",
@@ -3264,7 +3264,7 @@
     "correctIndices": [
       0
     ],
-    "explanation": "The PDF defines the disk lock as 'a centralized locking mechanism that provides a mutually exclusive locking mechanism for cluster nodes... mutual exclusion of nodes between clusters is no longer through the network but through the disk.'"
+    "explanation": "The disk lock as 'a centralized locking mechanism that provides a mutually exclusive locking mechanism for cluster nodes.. mutual exclusion of nodes between clusters is no longer through the network but through the disk.'"
   },
   {
     "id": "advanced-28",
@@ -3280,7 +3280,7 @@
     "correctIndices": [
       0
     ],
-    "explanation": "The PDF Write Same page states 'the CAS can issue a Write Same SCSI command to complete all write-zero tasks. The storage only needs to allocate corresponding spaces, and then return to the CAS without performing specific write-zero operations.'"
+    "explanation": "With Write Same, the CAS issues a Write Same SCSI command to complete all write-zero tasks. The storage only allocates the corresponding spaces and then returns to the CAS without performing specific write-zero operations."
   },
   {
     "id": "advanced-29",
@@ -3296,7 +3296,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF VM directly mounted RBD page states 'The RBD path can avoid the I/O performance loss caused by the ocfs2 file system and the ISCSI protocol' when CAS is connected to Ceph."
+    "explanation": "The VM directly mounted RBD path avoids the I/O performance loss caused by the ocfs2 file system and the iSCSI protocol when CAS is connected to Ceph."
   },
   {
     "id": "advanced-30",
@@ -3312,7 +3312,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF VM blue screen HA page states 'The CAStools running in the operating system interacts with the H3C CAS CVK kernel through a virtual serial port channel to determine the status of the operating system in real time.'"
+    "explanation": "CAStools running in the operating system interacts with the H3C CAS CVK kernel through a virtual serial port channel to determine the status of the operating system in real time."
   },
   {
     "id": "advanced-31",
@@ -3328,7 +3328,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF Active-Active Stretched Cluster section states 'RPO=0, minute-level RTO.'"
+    "explanation": "CAS Active-Active Stretched Cluster section states 'RPO=0, minute-level RTO.'"
   },
   {
     "id": "advanced-32",
@@ -3344,7 +3344,7 @@
     "correctIndices": [
       0
     ],
-    "explanation": "The PDF OVF heterogeneous platform migration page states it supports 'import and automatic conversion of four virtualization platforms: CAS CVM, VMware vSphere, Oracle VM and ZTE iECS.'"
+    "explanation": "OVF heterogeneous platform migration supports import and automatic conversion of four virtualization platforms: CAS CVM, VMware vSphere, Oracle VM and ZTE iECS."
   },
   {
     "id": "advanced-33",
@@ -3360,7 +3360,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF key-indicators page defines RPO as the maximum amount of data loss allowed during a disaster (data redundancy backup capability) and RTO as the time required for the system to recover from a disaster state to a runnable state."
+    "explanation": "RPO is the maximum amount of data loss allowed during a disaster (data redundancy backup capability) and RTO is the time required for the system to recover from a disaster state to a runnable state."
   },
   {
     "id": "advanced-34",
@@ -3376,13 +3376,13 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF disaster recovery level table lists Level 2 as RTO 1 to 7 days and RPO from several hours to 36 hours."
+    "explanation": "CAS disaster recovery level table lists Level 2 as RTO 1 to 7 days and RPO from several hours to 36 hours."
   },
   {
     "id": "advanced-35",
     "section": "Advanced Functions",
     "format": "multi",
-    "question": "Which of the following are configuration items defined on the H3C CAS HA configuration page (the main HA enablement page, excluding access-control sub-items)?",
+    "question": "Which of the following are configuration items on the H3C CAS HA configuration screen (the main HA enablement screen, excluding access-control sub-items)?",
     "options": [
       "Tick Enable HA",
       "VM startup priority (set the default startup priority of VMs in the cluster)",
@@ -3396,7 +3396,7 @@
       2,
       3
     ],
-    "explanation": "The PDF HA configuration page lists exactly these four items: Enable HA, VM startup priority, HA access control, and trigger actions (failover, VM freezing)."
+    "explanation": "HA configuration consists of exactly these four items: Enable HA, VM startup priority, HA access control, and trigger actions (failover, VM freezing)."
   },
   {
     "id": "advanced-36",
@@ -3416,7 +3416,7 @@
       2,
       3
     ],
-    "explanation": "The PDF memory over-commit page describes (0)-(3) for transparent page sharing and balloon driver; swapping to disk is the separate memory-swapping method, not the balloon driver."
+    "explanation": "CAS memory over-commit page describes (0)-(3) for transparent page sharing and balloon driver; swapping to disk is the separate memory-swapping method, not the balloon driver."
   },
   {
     "id": "advanced-37",
@@ -3436,7 +3436,7 @@
       2,
       3
     ],
-    "explanation": "The PDF Active-Active Stretched Cluster page lists exactly (0)-(3); RTO is explicitly stated as 'minute-level', not high several-hour."
+    "explanation": "Active-Active Stretched Cluster best practices include (0)-(3); RTO is 'minute-level', not several hours."
   },
   {
     "id": "advanced-38",
@@ -3456,7 +3456,7 @@
       2,
       3
     ],
-    "explanation": "The PDF MoveSure migration process page lists exactly the four steps (0)-(3); there is no ESXi-snapshot freezing step."
+    "explanation": "The MoveSure migration process consists of exactly the four steps (0)-(3); there is no ESXi-snapshot freezing step."
   },
   {
     "id": "advanced-39",
@@ -3475,7 +3475,7 @@
       1,
       2
     ],
-    "explanation": "The PDF Site disaster recovery configuration page lists exactly Site, Protection group, and Recovery plan as the SRM site DR configuration objects."
+    "explanation": "SRM site disaster recovery requires exactly three configuration objects: Site, Protection group, and Recovery plan."
   },
   {
     "id": "advanced-40",
@@ -3495,7 +3495,7 @@
       2,
       3
     ],
-    "explanation": "The PDF lists exactly these four SRM use scenarios; SRM is based on asynchronous remote replication, so option 4 (synchronous mirroring with zero data loss) is not an SRM scenario."
+    "explanation": "Exactly these four SRM use scenarios; SRM is based on asynchronous remote replication, so option 4 (synchronous mirroring with zero data loss) is not an SRM scenario."
   },
   {
     "id": "advanced-41",
@@ -3514,7 +3514,7 @@
       1,
       2
     ],
-    "explanation": "The PDF DRX configuration steps page lists exactly the three steps DHCP, LB policy, and DRX service on the CAS platform; SR-IOV and SRM are not DRX requirements."
+    "explanation": "DRX configuration consists of exactly three steps: DHCP on the switch, LB policy on the LB device, and DRX service on the CAS platform. SR-IOV and SRM are not DRX requirements."
   },
   {
     "id": "advanced-42",
@@ -3533,7 +3533,7 @@
       1,
       2
     ],
-    "explanation": "The PDF vGPU pages state exactly statements (0), (1), and (2); priority-based preemption explicitly exists, and video memory is per-vGPU fixed, not shared."
+    "explanation": "CAS vGPU pages state exactly statements (0), (1), and (2); priority-based preemption explicitly exists, and video memory is per-vGPU fixed, not shared."
   },
   {
     "id": "advanced-43",
@@ -3549,7 +3549,7 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The PDF cloud rainbow configuration page explicitly requires 'The version of the remote data center CVM to be added is the same as that of the local CVM'; different major versions are not permitted."
+    "explanation": "CAS cloud rainbow configuration page explicitly requires 'The version of the remote data center CVM to be added is the same as that of the local CVM'; different major versions are not permitted."
   },
   {
     "id": "advanced-44",
@@ -3565,7 +3565,7 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The PDF host wakeup methods page lists only Network wakeup and IPMI wakeup; serial console BREAK and PXE remote boot are not listed."
+    "explanation": "DPM supports only two host wakeup methods: Network wakeup and IPMI wakeup. Serial console BREAK and PXE remote boot are not supported."
   },
   {
     "id": "advanced-45",
@@ -3581,7 +3581,7 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The PDF USB redirection page describes a TCP/network-based USB redirection protocol with a software USB virtual interface; it is not VT-d PCIe passthrough of the USB controller."
+    "explanation": "CAS USB redirection page describes a TCP/network-based USB redirection protocol with a software USB virtual interface; it is not VT-d PCIe passthrough of the USB controller."
   },
   {
     "id": "advanced-46",
@@ -3597,7 +3597,7 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The PDF linked clone page states the optimization is adding a base-image cache on each CVK so the base image is read only once during batch startup; the base image remains shared, not replicated per VM."
+    "explanation": "The linked clone optimization adds a base-image cache on each CVK so the base image is read only once during batch startup; the base image remains shared, not replicated per VM."
   },
   {
     "id": "advanced-47",
@@ -3632,7 +3632,7 @@
     "correctIndices": [
       4
     ],
-    "explanation": "The PDF DPM policy page lists exactly the four prerequisites (same shared storage on hosts, same shared storage on VMs, Auto Migration on VMs, Wakeup on hosts); SR-IOV VF passthrough is not a DPM prerequisite."
+    "explanation": "DPM has exactly four prerequisites: same shared storage on hosts, same shared storage on VMs, Auto Migration on VMs, and Wakeup on hosts. SR-IOV VF passthrough is not a DPM prerequisite."
   },
   {
     "id": "advanced-49",
@@ -3649,7 +3649,7 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The PDF deployment-types page explicitly says a single data center 'Resist[s] the overall failure of the device' but only dual/multi data centers 'Resist central disasters'; option 3 contradicts this."
+    "explanation": "CAS deployment-types page explicitly says a single data center 'Resist[s] the overall failure of the device' but only dual/multi data centers 'Resist central disasters'; option 3 contradicts this."
   },
   {
     "id": "advanced-50",
@@ -3667,7 +3667,7 @@
       3,
       4
     ],
-    "explanation": "The PDF CDP page shows Agent-based protection of critical apps on bare metal and heterogeneous virtualization, contradicting option 3. SRA plug-ins are the SRM homogeneous-DR mechanism, not CDP, contradicting option 4."
+    "explanation": "CDP uses agent-based protection of critical apps on bare metal and heterogeneous virtualization, contradicting option 3. SRA plug-ins are the SRM homogeneous-DR mechanism, not CDP, contradicting option 4."
   },
   {
     "id": "maint-01",
@@ -3683,7 +3683,7 @@
     "correctIndices": [
       0
     ],
-    "explanation": "The PDF states that 'cha cluster-list' is used to obtain a list of clusters managed by the HA process; the other commands query host lists, cluster status, or node status."
+    "explanation": "'cha cluster-list' is used to obtain a list of clusters managed by the HA process; the other commands query host lists, cluster status, or node status."
   },
   {
     "id": "maint-02",
@@ -3699,7 +3699,7 @@
     "correctIndices": [
       2
     ],
-    "explanation": "Per the PDF, 'ovs-vsctl show' queries the vSwitch and its port information. 'ovs-vsctl -V' queries the internal version of OVS, and 'ovs-appctl bond/show' queries vSwitch port binding information."
+    "explanation": "'ovs-vsctl show' queries the vSwitch and its port information. 'ovs-vsctl -V' queries the internal version of OVS, and 'ovs-appctl bond/show' queries vSwitch port binding information."
   },
   {
     "id": "maint-03",
@@ -3715,7 +3715,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF explicitly lists the four alarm indicators on the main management interface as Critical Alarm, Major Alarm, Minor Alarm, and Warning."
+    "explanation": "CAS explicitly lists the four alarm indicators on the main management interface as Critical Alarm, Major Alarm, Minor Alarm, and Warning."
   },
   {
     "id": "maint-04",
@@ -3731,7 +3731,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF documents 'ovs-appctl bond/show' as the command to query vSwitch port binding information."
+    "explanation": "CAS documents 'ovs-appctl bond/show' as the command to query vSwitch port binding information."
   },
   {
     "id": "maint-05",
@@ -3747,7 +3747,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF notes that VMs should normally be shut down from inside the guest OS, and virsh start/shutdown in the background should be used only when the VM cannot be operated in the foreground under special circumstances."
+    "explanation": "VMs should normally be shut down from inside the guest OS, and virsh start/shutdown in the background should be used only when the VM cannot be operated in the foreground under special circumstances."
   },
   {
     "id": "maint-06",
@@ -3763,7 +3763,7 @@
     "correctIndices": [
       2
     ],
-    "explanation": "The PDF says CASToolkit is an automatic inspection tool with two parts: executing the CASToolkit tool on the CVM node and uploading the result to the iService platform to get a report."
+    "explanation": "CASToolkit is an automatic inspection tool with two parts: executing the CASToolkit tool on the CVM node and uploading the result to the iService platform to get a report."
   },
   {
     "id": "maint-07",
@@ -3779,7 +3779,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF states Host Passthrough mode directly passes the host CPU model and major functions to the VM, providing the best performance but poor migration compatibility, with migration only possible between hosts with exactly the same CPU model."
+    "explanation": "Host Passthrough mode directly passes the host CPU model and major functions to the VM, providing the best performance but poor migration compatibility, with migration only possible between hosts with exactly the same CPU model."
   },
   {
     "id": "maint-08",
@@ -3797,7 +3797,7 @@
       1,
       2
     ],
-    "explanation": "The PDF states that under Alarm Management / Notifications you can configure Email/SMS/Syslog to receive alarms timely. SNMP Trap is not listed as a notification channel in this module."
+    "explanation": "Under Alarm Management / Notifications you can configure Email/SMS/Syslog to receive alarms timely. SNMP Trap is not listed as a notification channel."
   },
   {
     "id": "maint-09",
@@ -3817,7 +3817,7 @@
       2,
       3
     ],
-    "explanation": "The PDF lists the decompressed log file types as logs of CVK hosts, HA configuration file information, logs of Web container Tomcat, and logs of CVM management platform functions. Source code patches are not part of the log package."
+    "explanation": "The decompressed log file types as logs of CVK hosts, HA configuration file information, logs of Web container Tomcat, and logs of CVM management platform functions. Source code patches are not part of the log package."
   },
   {
     "id": "maint-10",
@@ -3836,13 +3836,13 @@
       1,
       3
     ],
-    "explanation": "Per the PDF, Compatible mode unifies different physical CPUs into the same vCPU model for good migration but reduced performance; Host mode virtualizes to the most similar vCPU model with poor migration but better performance. Host Passthrough has poor migration compatibility, not best."
+    "explanation": "Compatible mode unifies different physical CPUs into the same vCPU model for good migration but reduced performance; Host mode virtualizes to the most similar vCPU model with poor migration but better performance. Host Passthrough has poor migration compatibility, not best."
   },
   {
     "id": "maint-11",
     "section": "Maintenance",
     "format": "multi",
-    "question": "According to the PDF, which of the following steps are part of the recommended procedure for replacing the CPU, memory, or disk hardware on a CAS host?",
+    "question": "Which of the following steps are part of the recommended procedure for replacing the CPU, memory, or disk hardware on a CAS host?",
     "options": [
       "Check the cluster health and check the service load",
       "Migrate VMs and back up management platform data",
@@ -3856,7 +3856,7 @@
       2,
       4
     ],
-    "explanation": "The PDF's hardware-replacement workflow includes checking cluster health and service load, migrating VMs, backing up management platform data, entering maintenance mode, shutting down the host, replacing the hardware, exiting maintenance mode, checking cluster status, and one-key inspection. Skipping the post-check is never recommended."
+    "explanation": "CAS's hardware-replacement workflow includes checking cluster health and service load, migrating VMs, backing up management platform data, entering maintenance mode, shutting down the host, replacing the hardware, exiting maintenance mode, checking cluster status, and one-key inspection. Skipping the post-check is never recommended."
   },
   {
     "id": "maint-12",
@@ -3876,7 +3876,7 @@
       2,
       4
     ],
-    "explanation": "The PDF rule set: do not modify time into the past, only modify into the future; back up CVM configuration; check for time-sensitive apps; turn off VM time sync and shut down the VMs; then change NTP/CVK time; finally start the VMs and restore service."
+    "explanation": "CAS rule set: do not modify time into the past, only modify into the future; back up CVM configuration; check for time-sensitive apps; turn off VM time sync and shut down the VMs; then change NTP/CVK time; finally start the VMs and restore service."
   },
   {
     "id": "maint-13",
@@ -3892,7 +3892,7 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The PDF lists cha cluster-list, cha cluster-status, cha node-list, and cha node-status as the documented HA commands. There is no 'cha node-restart' command in the PDF."
+    "explanation": "Cha cluster-list, cha cluster-status, cha node-list, and cha node-status as the standard HA commands. There is no 'cha node-restart' command."
   },
   {
     "id": "maint-14",
@@ -3908,7 +3908,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF says it is NOT recommended to log in to the CVK background through SSH to modify the root password; doing so destroys the CVM/CVK confidentiality-free relationship and may cause abnormal CVK display in the CVM foreground."
+    "explanation": "It is NOT recommended to log in to the CVK background through SSH to modify the root password; doing so destroys the CVM/CVK confidentiality-free relationship and may cause abnormal CVK display in the CVM foreground."
   },
   {
     "id": "maint-15",
@@ -3926,7 +3926,7 @@
       2,
       3
     ],
-    "explanation": "The PDF states online upgrade requires the running VMs to use shared storage (otherwise upgrade will fail) and never demands all VMs be powered off; that requirement belongs to offline upgrade. The other statements match the documented prerequisites."
+    "explanation": "Online upgrade requires the running VMs to use shared storage (otherwise upgrade will fail) and never demands all VMs be powered off; that requirement belongs to offline upgrade. The other statements match the standard prerequisites."
   },
   {
     "id": "maint-16",
@@ -3942,7 +3942,7 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The PDF explicitly warns that the CVM system becomes unavailable after the restart command is executed, all tasks must be stopped beforehand, and no operations should be performed during the procedure."
+    "explanation": "CAS explicitly warns that the CVM system becomes unavailable after the restart command is executed, all tasks must be stopped beforehand, and no operations should be performed during the procedure."
   },
   {
     "id": "maint-17",
@@ -3960,7 +3960,7 @@
       3,
       4
     ],
-    "explanation": "The PDF lists HA log (self-developed), Ocfs2_shell_XX.log, VM related log, vSwitch log, 'Log manually executed in the background', and fsm storage manager log as items in the CVK var directory; statements 4 and 5 contradict this."
+    "explanation": "HA log (self-developed), Ocfs2_shell_XX.log, VM related log, vSwitch log, 'Log manually executed in the background', and fsm storage manager log as items in the CVK var directory; statements 4 and 5 contradict this."
   },
   {
     "id": "maint-18",
@@ -3978,7 +3978,7 @@
       2,
       3
     ],
-    "explanation": "The PDF specifies Disk Provision should choose 'Lazy Zeroed' (not Eager Zeroed) and that HugePages must be enabled on the host first and then on the VM (not the other way around). The other statements match documented optimization items."
+    "explanation": "Disk Provision should choose 'Lazy Zeroed' (not Eager Zeroed) and that HugePages must be enabled on the host first and then on the VM (not the other way around). The other statements match documented optimization items."
   },
   {
     "id": "maint-19",
@@ -3994,7 +3994,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "Per the PDF, 'virsh domblklist ID' queries the VM disk structure in the background of the CVK host. 'virsh pool-list --all' queries storage pool operation, 'virsh list --all' queries VMs, and 'qemu-img info' queries image file information."
+    "explanation": "'virsh domblklist ID' queries the VM disk structure in the background of the CVK host. 'virsh pool-list --all' queries storage pool operation, 'virsh list --all' queries VMs, and 'qemu-img info' queries image file information."
   },
   {
     "id": "maint-20",
@@ -4010,7 +4010,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF documents 'virsh pool-list --all' as the command to query storage pool operation in the background of the CVK host, returning Name/State/Autostart columns for defaultpool, isopool, ONEStor_High_LUN01, etc."
+    "explanation": "CAS documents 'virsh pool-list --all' as the command to query storage pool operation in the background of the CVK host, returning Name/State/Autostart columns for defaultpool, isopool, ONEStor_High_LUN01, etc."
   },
   {
     "id": "maint-21",
@@ -4026,7 +4026,7 @@
     "correctIndices": [
       2
     ],
-    "explanation": "The PDF documents 'service libvirtd restart' (alongside 'service casserver restart') as the maintenance command to restart the libvirtd daemon on the CVK host."
+    "explanation": "CAS documents 'service libvirtd restart' (alongside 'service casserver restart') as the maintenance command to restart the libvirtd daemon on the CVK host."
   },
   {
     "id": "maint-22",
@@ -4042,13 +4042,13 @@
     "correctIndices": [
       2
     ],
-    "explanation": "The PDF documents 'qemu-img convert -O qcow2 -f qcow2 xxx' to combine image files. 'qemu-img info' queries image information, and the other forms are not documented."
+    "explanation": "CAS documents 'qemu-img convert -O qcow2 -f qcow2 xxx' to combine image files. 'qemu-img info' queries image information, and the other forms are not documented."
   },
   {
     "id": "maint-23",
     "section": "Maintenance",
     "format": "single",
-    "question": "Which Linux command listed in the CAS common maintenance commands is used to capture packets on a CVK host?",
+    "question": "Which Linux command among the CAS common maintenance commands is used to capture packets on a CVK host?",
     "options": [
       "ifconfig",
       "tcpdump",
@@ -4058,13 +4058,13 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF lists 'tcpdump: Capture packets' among the common Linux commands. 'ifconfig' queries NIC information, 'iostat' queries device load, and 'uptime' queries system start time and load."
+    "explanation": "'tcpdump: Capture packets' is among the common Linux maintenance commands. 'ifconfig' queries NIC information, 'iostat' queries device load, and 'uptime' queries system start time and load."
   },
   {
     "id": "maint-24",
     "section": "Maintenance",
     "format": "single",
-    "question": "According to the PDF, which key on the keyboard is used in vi/vim to switch back from edit mode to the common mode?",
+    "question": "Which key on the keyboard is used in vi/vim to switch back from edit mode to the common mode?",
     "options": [
       "Ctrl+C",
       "Tab",
@@ -4074,13 +4074,13 @@
     "correctIndices": [
       2
     ],
-    "explanation": "The PDF states 'Press \"ESC\" to switch back to the common mode' in the vi/vim workflow. ':wq' is used to save and exit; ':q' alone is not listed; Ctrl+C and Tab are not documented mode-switch keys for vi in the source."
+    "explanation": "'Press \"ESC\" to switch back to the common mode' in the vi/vim workflow. ':wq' is used to save and exit; ':q' alone is not listed; Ctrl+C and Tab are not documented mode-switch keys for vi in the source."
   },
   {
     "id": "maint-25",
     "section": "Maintenance",
     "format": "single",
-    "question": "In the iostat output described in the CAS maintenance commands, what does the column header 'tps' represent?",
+    "question": "In the iostat output of the CAS maintenance commands, what does the column header 'tps' represent?",
     "options": [
       "Total physical sectors written by the device.",
       "The number of IO read and write requests issued by the process per second.",
@@ -4090,7 +4090,7 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF iostat field table defines tps as 'The number of IO read and write requests issued by the process per second'. The other definitions belong to kB_read/kB_wrtn or are not iostat metrics."
+    "explanation": "In iostat, tps is defined as 'The number of IO read and write requests issued by the process per second'. The other definitions belong to kB_read/kB_wrtn or are not iostat metrics."
   },
   {
     "id": "maint-26",
@@ -4106,13 +4106,13 @@
     "correctIndices": [
       1
     ],
-    "explanation": "The PDF lists 'scp: Copy files remotely'. 'cp' is local copy, 'mv' moves/renames files, and 'tar' is used to compress and pack files."
+    "explanation": "'scp: Copy files remotely'. 'cp' is local copy, 'mv' moves/renames files, and 'tar' is used to compress and pack files."
   },
   {
     "id": "maint-27",
     "section": "Maintenance",
     "format": "multi",
-    "question": "Which of the following are valid options listed in the upgrade.sh script usage for CAS version upgrade?",
+    "question": "Which of the following are valid options in the upgrade.sh script usage for CAS version upgrade?",
     "options": [
       "-p cvks",
       "precheck",
@@ -4126,13 +4126,13 @@
       2,
       3
     ],
-    "explanation": "The PDF shows: Usage: ./upgrade.sh [option]  option: [ | -p cvks | precheck | postcheck | copy | -f cvm | -f cvk | --force-cvk | restore | mysql]. '--rollback-cvm' is not in the documented option list."
+    "explanation": "The standard usage is:./upgrade.sh [option] option: [ | -p cvks | precheck | postcheck | copy | -f cvm | -f cvk | --force-cvk | restore | mysql]. '--rollback-cvm' is not a valid option."
   },
   {
     "id": "maint-28",
     "section": "Maintenance",
     "format": "multi",
-    "question": "According to the PDF, which steps are part of the documented procedure for replacing the network interface card (NIC) on a CVK host?",
+    "question": "Which steps are part of the standard procedure for replacing the network interface card (NIC) on a CVK host?",
     "options": [
       "Back up NIC configuration files",
       "Migrate VMs and back up management platform data",
@@ -4146,7 +4146,7 @@
       2,
       3
     ],
-    "explanation": "The PDF's NIC replacement workflow includes check cluster health, back up NIC configuration files, migrate VMs, back up management platform data, enter maintenance mode, shut down the host, replace the NIC, exit maintenance mode, check cluster status, and one-key inspection."
+    "explanation": "CAS's NIC replacement workflow includes check cluster health, back up NIC configuration files, migrate VMs, back up management platform data, enter maintenance mode, shut down the host, replace the NIC, exit maintenance mode, check cluster status, and one-key inspection."
   },
   {
     "id": "maint-29",
@@ -4165,13 +4165,13 @@
       1,
       2
     ],
-    "explanation": "The PDF specifies Ubuntu path /etc/udev/rules.d/70-persistent-net.rules and CentOS path /etc/sysconfig/network-scripts/ifcfg-ethx, and that after replacement the new eth number follows the original and the MAC address must be updated. The PDF also states a NEW ifcfg-ethx file IS added in CentOS, and NIC config files MUST be backed up."
+    "explanation": "Ubuntu path /etc/udev/rules.d/70-persistent-net.rules and CentOS path /etc/sysconfig/network-scripts/ifcfg-ethx, and that after replacement the new eth number follows the original and the MAC address must be updated. CAS also states a NEW ifcfg-ethx file IS added in CentOS, and NIC config files MUST be backed up."
   },
   {
     "id": "maint-30",
     "section": "Maintenance",
     "format": "multi",
-    "question": "Which of the following statements about the stateful-failover (CVM HA) cmsd service procedures described in the PDF are correct?",
+    "question": "Which of the following statements about the stateful-failover (CVM HA) cmsd service procedures are correct?",
     "options": [
       "Modifying the virtual IP address requires stopping the cmsd service, modifying the IP, and starting the cmsd service.",
       "When adding a new CVK node as an advanced host, copy the /etc/cmsd folder from the existing node to the new node.",
@@ -4185,13 +4185,13 @@
       2,
       3
     ],
-    "explanation": "The PDF documents the Modify Virtual IP procedure (Check status, Stop cmsd, Check, Modify IP, Start cmsd, Check), Copy /etc/cmsd to the new CVK node, 'service cron restart' on Ubuntu after the crontab edit, and 'systemctl enable cmsd.service' on H3Linux. A destructive reinstall is not described."
+    "explanation": "CAS documents the Modify Virtual IP procedure (Check status, Stop cmsd, Check, Modify IP, Start cmsd, Check), Copy /etc/cmsd to the new CVK node, 'service cron restart' on Ubuntu after the crontab edit, and 'systemctl enable cmsd.service' on H3Linux. A destructive reinstall is not described."
   },
   {
     "id": "maint-31",
     "section": "Maintenance",
     "format": "multi",
-    "question": "Which of the following items are listed in the CAS Performance Optimization configuration ideas?",
+    "question": "Which of the following items are part of the CAS Performance Optimization configuration ideas?",
     "options": [
       "Configure I/O Priority",
       "Configure CPU Model",
@@ -4205,7 +4205,7 @@
       2,
       3
     ],
-    "explanation": "The PDF numbers four optimization items: 1) Configure I/O Priority, 2) Configure CPU Model, 3) Configure HugePages (enable host first, then VM), 4) Disk Provision choose 'Lazy Zeroed'. Memory Ballooning is not part of the optimization list."
+    "explanation": "Performance optimization has four numbered items: 1) Configure I/O Priority, 2) Configure CPU Model, 3) Configure HugePages (enable host first, then VM), 4) Disk Provision choose 'Lazy Zeroed'. Memory Ballooning is not part of the optimization list."
   },
   {
     "id": "maint-32",
@@ -4213,10 +4213,10 @@
     "format": "multi",
     "question": "Which of the following resolution steps are documented for a VM console that does not respond to keyboard input on a failed Windows VM (after Ctrl+Alt+Del)?",
     "options": [
-      "If the Windows disk is corrupt, mount an .iso repair image file onto the VM.",
+      "If the Windows disk is corrupt, mount an.iso repair image file onto the VM.",
       "Configure the VM to start from the CD/DVD drive, then restart the VM and open its console.",
       "Press any key at the boot prompt in the console to start from CD/DVD for reparation or reinstallation.",
-      "If no guest OS is installed, mount the guest OS .iso or configure the VM to obtain the guest OS from a remote server over the network.",
+      "If no guest OS is installed, mount the guest OS.iso or configure the VM to obtain the guest OS from a remote server over the network.",
       "Force-delete the VM and recreate it from scratch with a different hypervisor."
     ],
     "correctIndices": [
@@ -4225,23 +4225,23 @@
       2,
       3
     ],
-    "explanation": "The PDF lists the .iso repair mount, CD/DVD boot order, press-any-key prompt, and remote/network OS install as the official steps. There is no recommendation to delete the VM or switch hypervisors."
+    "explanation": "The.iso repair mount, CD/DVD boot order, press-any-key prompt, and remote/network OS install as the official steps. There is no recommendation to delete the VM or switch hypervisors."
   },
   {
     "id": "maint-33",
     "section": "Maintenance",
     "format": "negative",
-    "question": "Regarding the documented qemu and virsh commands on a CVK host, which of the following statements is INCORRECT?",
+    "question": "Regarding the standard qemu and virsh commands on a CVK host, which of the following statements is INCORRECT?",
     "options": [
       "'qemu-img info <VM image file>' queries VM image file information.",
       "'virsh domblklist ID' queries the VM disk structure in the background of the CVK host.",
       "'virsh pool-list --all' queries storage pool operation in the background.",
-      "'virsh image-merge' is the documented command to combine multiple qcow2 image files into one."
+      "'virsh image-merge' is the standard command to combine multiple qcow2 image files into one."
     ],
     "correctIndices": [
       3
     ],
-    "explanation": "The PDF documents 'qemu-img convert -O qcow2 -f qcow2 xxx' (not 'virsh image-merge') to combine image files. 'virsh image-merge' is not a documented command."
+    "explanation": "CAS documents 'qemu-img convert -O qcow2 -f qcow2 xxx' (not 'virsh image-merge') to combine image files. 'virsh image-merge' is not a documented command."
   },
   {
     "id": "maint-34",
@@ -4257,13 +4257,13 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The PDF's resolution is exactly the opposite: open only one tab in only one browser window on a computer to access CVM, and clear the buffer of the browser before logging in again. Multiple tabs/browsers are documented causes of the issue, not the fix."
+    "explanation": "CAS's resolution is exactly the opposite: open only one tab in only one browser window on a computer to access CVM, and clear the buffer of the browser before logging in again. Multiple tabs/browsers are documented causes of the issue, not the fix."
   },
   {
     "id": "maint-35",
     "section": "Maintenance",
     "format": "negative",
-    "question": "Regarding the procedure to modify the IP address and host name of a CVK host described in the PDF, which of the following descriptions is INCORRECT?",
+    "question": "Regarding the procedure to modify the IP address and host name of a CVK host, which of the following descriptions is INCORRECT?",
     "options": [
       "Migrate the VMs off the host before modifying.",
       "Delete the host from the cluster, then modify the IP / host name.",
@@ -4273,13 +4273,13 @@
     "correctIndices": [
       3
     ],
-    "explanation": "The PDF process is: Migrate the VM, delete the host from the cluster, modify the IP/host name, add the host again, migrate the VM back. Editing in-place while keeping the host in the cluster is not the documented procedure."
+    "explanation": "CAS process is: Migrate the VM, delete the host from the cluster, modify the IP/host name, add the host again, migrate the VM back. Editing in-place while keeping the host in the cluster is not the standard procedure."
   },
   {
     "id": "maint-36",
     "section": "Maintenance",
     "format": "negative",
-    "question": "Regarding the documented troubleshooting for the 'Disabling IRQ #10 BUG: Soft lockup - CPU#0 stuck for 67s! [migration/0:5]' error when shutting down Linux VMs on CAS, which statements are INCORRECT? (Select all that apply.)",
+    "question": "Regarding the standard troubleshooting for the 'Disabling IRQ #10 BUG: Soft lockup - CPU#0 stuck for 67s! [migration/0:5]' error when shutting down Linux VMs on CAS, which statements are INCORRECT? (Select all that apply.)",
     "options": [
       "The error typically occurs when a VM uses a virtio NIC with poor compatibility with some Linux versions.",
       "When this error message appears, the VM shutdown procedure is almost finished, and the VM can be powered off from CAS to force shutdown without incurring problems.",
@@ -4291,7 +4291,7 @@
       2,
       3
     ],
-    "explanation": "The PDF's solution is to power off the VM from CAS to force shutdown without incurring problems; it does NOT recommend downgrading libvirtd or replacing the NIC type. The other statements match the documented condition and solution."
+    "explanation": "CAS's solution is to power off the VM from CAS to force shutdown without incurring problems; it does NOT recommend downgrading libvirtd or replacing the NIC type. The other statements match the standard condition and solution."
   },
   {
     "id": "maint-37",
@@ -4309,6 +4309,6 @@
       3,
       4
     ],
-    "explanation": "The PDF states the storage pool must NOT be active during reformat, and the RHEL 7 fix is to DISABLE NetworkManager ('chkconfig NetworkManager off') after updating CAStools, not enable it. The first three statements match the PDF's documented resolutions."
+    "explanation": "The storage pool must NOT be active during reformat, and the RHEL 7 fix is to DISABLE NetworkManager ('chkconfig NetworkManager off') after updating CAStools, not enable it. The first three statements match CAS's documented resolutions."
   }
 ]
