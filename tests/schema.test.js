@@ -169,6 +169,37 @@ describe("VALID_FORMATS — exhaustive", () => {
   });
 });
 
+describe("checkTerminologyCasing — canonical casing of H3C terms", () => {
+  it("flags non-canonical 'cas' as WARN", async () => {
+    const { checkTerminologyCasing } = await import("../public/assets/js/lib/schema.js");
+    const q = goodSingle();
+    q.explanation = "The cas platform supports VM migration across hosts.";
+    const issues = checkTerminologyCasing([q]);
+    expect(issues.some((i) => /should be canonical "CAS"/.test(i.message))).toBe(true);
+  });
+  it("flags 'Qemu' (should be 'qemu')", async () => {
+    const { checkTerminologyCasing } = await import("../public/assets/js/lib/schema.js");
+    const q = goodSingle();
+    q.explanation = "Use the Qemu-img command to inspect a virtual disk.";
+    const issues = checkTerminologyCasing([q]);
+    expect(issues.some((i) => /should be canonical "qemu"/.test(i.message))).toBe(true);
+  });
+  it("flags 'QCOW2' (should be 'qcow2')", async () => {
+    const { checkTerminologyCasing } = await import("../public/assets/js/lib/schema.js");
+    const q = goodSingle();
+    q.explanation = "QCOW2 is the standard image format for the platform.";
+    const issues = checkTerminologyCasing([q]);
+    expect(issues.some((i) => /should be canonical "qcow2"/.test(i.message))).toBe(true);
+  });
+  it("allows canonical 'CAS', 'qcow2', 'qemu'", async () => {
+    const { checkTerminologyCasing } = await import("../public/assets/js/lib/schema.js");
+    const q = goodSingle();
+    q.explanation = "The CAS platform stores qcow2 disks and uses qemu under the hood.";
+    const issues = checkTerminologyCasing([q]);
+    expect(issues.length).toBe(0);
+  });
+});
+
 describe("validateQuestion — source-leak detection", () => {
   // Note: "the official syllabus" is intentionally allowed — it's how the SITE
   // communicates the real H3C exam policy (50Q/60min/60% pass), not a private source.

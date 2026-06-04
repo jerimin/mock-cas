@@ -161,6 +161,48 @@ export function checkSectionBalance(bank, opts = {}) {
   return issues;
 }
 
+/**
+ * Canonical casing for H3C/CAS terms.
+ * Returns WARN-level issues for non-canonical occurrences anywhere in the bank.
+ *
+ * - IQN: uppercase as an acronym, but the prefix in actual IQN strings is always lowercase ("iqn.YYYY-MM..."). The check excludes "iqn." (followed by a dot).
+ * - K8s: mixed-case is canonical (Kubernetes shortform).
+ * - qcow2 / qemu / qemu-img: lowercase canonical (file format / command names).
+ */
+export const CANONICAL_CASING = Object.freeze({
+  CAS:     /\b(?:Cas|cas)\b/g,
+  CVK:     /\b(?:Cvk|cvk)\b/g,
+  CVM:     /\b(?:Cvm|cvm)\b/g,
+  H3C:     /\b(?:H3c|h3c)\b/g,
+  OCFS2:   /\b(?:Ocfs2|ocfs2)\b/g,
+  TPS:     /\b(?:Tps|tps)\b/g,
+  K8s:     /\b(?:K8S|k8s|k8S)\b/g,
+  qcow2:   /\bQCOW2\b/g,
+  qemu:    /\b(?:QEMU|Qemu)\b/g,
+});
+
+export function checkTerminologyCasing(bank) {
+  const issues = [];
+  for (const q of bank) {
+    const fields = [
+      ["question", q?.question || ""],
+      ...(Array.isArray(q?.options) ? q.options.map((o, i) => [`option ${i}`, o || ""]) : []),
+      ["explanation", q?.explanation || ""],
+    ];
+    for (const [field, text] of fields) {
+      for (const [canon, pat] of Object.entries(CANONICAL_CASING)) {
+        const re = new RegExp(pat.source, pat.flags);
+        let m;
+        while ((m = re.exec(text)) !== null) {
+          // skip "iqn." inside IQN strings — not relevant here since IQN's pattern is only its acronym variant
+          issues.push({ id: q?.id, severity: SEVERITY.WARN, message: `${field}: "${m[0]}" should be canonical "${canon}"` });
+        }
+      }
+    }
+  }
+  return issues;
+}
+
 /** Per-format mix matches 40/30/30 (within tolerance). */
 export function checkFormatBalance(bank, opts = {}) {
   const targets = opts.targets ?? { single: 0.40, multi: 0.30, negative: 0.30 };
@@ -232,6 +274,9 @@ export function validateBank(bank, opts = {}) {
   // Balance
   for (const issue of checkSectionBalance(bank, opts.section)) push(issue);
   for (const issue of checkFormatBalance(bank, opts.format)) push(issue);
+
+  // Terminology casing
+  for (const issue of checkTerminologyCasing(bank)) push(issue);
 
   const summary = {
     total: bank.length,

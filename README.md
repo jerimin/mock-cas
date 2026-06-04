@@ -1,6 +1,6 @@
 # mock-cas
 
-[![v1.2.0](https://img.shields.io/badge/version-1.2.0-F38020.svg)](https://github.com/jerimin/mock-cas/releases/tag/v1.2.0)
+[![v1.3.0](https://img.shields.io/badge/version-1.2.0-F38020.svg)](https://github.com/jerimin/mock-cas/releases/tag/v1.3.0)
 [![Status: locked](https://img.shields.io/badge/status-locked-1F9C5B.svg)](#status)
 
 Timed mock exam for **GB0-713 — Deploy and Manage the H3C CAS Virtualization Platform (H3CNE-Cloud)**. Live at https://mock.mymine.space.
