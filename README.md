@@ -1,6 +1,6 @@
 # mock-cas
 
-[![v1.3.0](https://img.shields.io/badge/version-1.3.0-F38020.svg)](https://github.com/jerimin/mock-cas/releases/tag/v1.3.0)
+[![v1.3.0](https://img.shields.io/badge/version-1.3.1-F38020.svg)](https://github.com/jerimin/mock-cas/releases/tag/v1.3.1)
 [![Status: locked](https://img.shields.io/badge/status-locked-1F9C5B.svg)](#status)
 
 Timed mock exam for **GB0-713 — Deploy and Manage the H3C CAS Virtualization Platform (H3CNE-Cloud)**. Live at https://mock.mymine.space.
@@ -9,7 +9,7 @@ Vanilla HTML + CSS + JS, served from Cloudflare Workers Static Assets with a tin
 
 ## Status
 
-**Locked at v1.3.0** — feature-complete; merges to `main` should be limited to bank-content updates, CF deploy fixes, security patches, and additional tests. Major behaviour changes warrant a v2 branch.
+**Locked at v1.3.1** — feature-complete; merges to `main` should be limited to bank-content updates, CF deploy fixes, security patches, and additional tests. Major behaviour changes warrant a v2 branch.
 
 Always run `npm run check` before pushing (it runs `tsc --noEmit && validate && test`). All five targeted-regression tests block:
 
