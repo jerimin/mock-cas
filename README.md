@@ -19,8 +19,8 @@ Always run `npm run check` before pushing (it runs `tsc --noEmit && validate && 
 - An out-of-range correctIndex
 - Any reference to private source material ("the course", "the PDF", "the module", "the slide", "in the table", etc. — see `SOURCE_LEAK` regex in `schema.js`). Allowed false-positives: "the reference port" (LACP), "the reference architecture".
 
-What's locked at v1.0.0:
-- Bank: 250 questions (25/50/38/50/50/37 per module · 40/29/30 single/multi/negative · zero duplicates)
+What's locked at v1.3.1:
+- Bank: 250 questions (25/50/38/50/50/37 per module · 40/30/30 single/multi/negative · zero exact + zero near duplicates)
 - Engine: 50Q/60min/60% pass policy, partial credit, end-anytime, stratified sampling, behaviour analysis (timing/marks/changes)
 - Email flow: 6-digit verification → SMTP2GO HTML summary email + PDF attachment (pdf-lib, Worker-side)
 - UI: CF-style light + dark themes, distinct nav-grid colours, fits a single viewport, 10s Cloud Digit sponsored toast on result
@@ -92,7 +92,7 @@ The repo is pre-wired but two things must be set in the Cloudflare dashboard:
 
 | Name | Type | Value |
 |---|---|---|
-| `SMTP2GO_API_KEY` | Secret | Same SMTP2GO API key used by `clouddigit-site`. Required for `/api/email-report`. |
+| `SMTP2GO_API_KEY` | Secret | Same SMTP2GO API key used by `clouddigit-site`. Required for the email-verify endpoints. |
 | `SENDER_EMAIL` | Variable (optional) | Default `do-not-reply@mymine.space` (DKIM-verified for the `mymine.space` zone). |
 | `SENDER_NAME` | Variable (optional) | Default `GB0-713 Mock Exam`. |
 
