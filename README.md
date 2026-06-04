@@ -9,7 +9,14 @@ Vanilla HTML + CSS + JS, served from Cloudflare Workers Static Assets with a tin
 
 ## Status
 
-**Locked at v1.0.0** — feature-complete; merges to `main` should be limited to bank-content updates, CF deploy fixes, and security patches. Major behaviour changes warrant a v2 branch.
+**Locked at v1.1.0** — feature-complete; merges to `main` should be limited to bank-content updates, CF deploy fixes, security patches, and additional tests. Major behaviour changes warrant a v2 branch.
+
+Always run `npm run check` before pushing (it runs `tsc --noEmit && validate && test`). All four targeted-regression tests block:
+
+- A 6-option question (the v1.0.0 bug where intro-06 escaped initial verification)
+- An exact-stem duplicate (the deploy-27 vs deploy-12 bug)
+- A format-vs-correctIndices mismatch (single with 2 indices, multi with 1)
+- An out-of-range correctIndex
 
 What's locked at v1.0.0:
 - Bank: 250 questions (25/50/38/50/50/37 per module · 40/29/30 single/multi/negative · zero duplicates)
@@ -105,8 +112,30 @@ Visitor ID = SHA-256 of `cf-connecting-ip + user-agent`, first 8 bytes hex. IPs 
 
 ```sh
 npm install
-npm run dev   # wrangler dev — serves http://localhost:8787 with KV miniflare
+npm run dev          # wrangler dev — serves http://localhost:8787 with KV miniflare
 ```
+
+## Verify before pushing
+
+```sh
+npm run check        # tsc --noEmit, then bank validator, then vitest suite
+# or individually:
+npm run typecheck
+npm run validate                 # bank-only schema + dup + balance check
+npm run validate:strict          # same, but warnings fail too
+npm test                         # 48 vitest cases — scoring, sampling, schema, live bank
+```
+
+CF Workers Build is configured at the dashboard; the simplest hardening is to set the **Build command** to `npm run check && npx wrangler deploy` so a bad bank or failing test blocks deploy.
+
+### Shared lib (`public/assets/js/lib/`)
+
+- `util.js`     — `shuffle`, `setsEqual`, `normaliseStem`
+- `scoring.js`  — `scoreQuestion(selectedPositions, correctPositions)` returning `{score, status}`. Single source of truth for partial-credit math.
+- `sampling.js` — `WEIGHTS`, `SECTIONS`, `computeTargets`, `stratifiedPick`
+- `schema.js`   — `validateQuestion`, `validateBank`, `findDuplicateStems`, `findDuplicateIds`, `checkSectionBalance`, `checkFormatBalance`, `SEVERITY`, `VALID_FORMATS`
+
+The browser engine (`exam.js`) is loaded as `type="module"` and imports from `./lib/*`. The same modules are imported by the Vitest tests and the `scripts/validate-bank.js` CLI — no duplication, no divergence.
 
 ## Deploy
 

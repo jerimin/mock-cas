@@ -3,9 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "description": "Timed mock exam for GB0-713 (H3CNE-Cloud) — 250-question bank, partial credit, verified email + PDF report. Cloudflare Workers Static Assets at mock.mymine.space.",
+  "type": "module",
   "scripts": {
     "deploy": "wrangler deploy",
-    "dev": "wrangler dev"
+    "dev": "wrangler dev",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "validate": "node scripts/validate-bank.js",
+    "validate:strict": "node scripts/validate-bank.js --warn-as-error",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run validate && npm test"
   },
   "dependencies": {
     "pdf-lib": "^1.17.1"
@@ -13,6 +20,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250601.0",
     "typescript": "^5.6.0",
+    "vitest": "^2.1.9",
     "wrangler": "^4.0.0"
   }
 }

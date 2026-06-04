@@ -3,20 +3,17 @@
    Sampling: stratified by module weights (full mode)
    Scoring: 1.0 / partial (0..1) for multi / 0 incorrect / 0 skipped
    States: setup -> running -> review
+
+   Shared logic lives in ./lib/ — imported by both this engine and the Vitest tests.
 */
-(() => {
+import { shuffle, setsEqual } from "./lib/util.js";
+import { scoreQuestion, STATUS } from "./lib/scoring.js";
+import { stratifiedPick, WEIGHTS } from "./lib/sampling.js";
+
+{
   const STORAGE_KEY = "mock-cas-state-v4";
   const BANK_URL = "/assets/data/bank.json";
   const PASS_PCT = 60;
-
-  const WEIGHTS = {
-    "Virtualization Introduction": 0.10,
-    "Virtualized Infrastructure": 0.20,
-    "Deploying Virtualization Platform": 0.15,
-    "Basic Functions": 0.20,
-    "Advanced Functions": 0.20,
-    "Maintenance": 0.15,
-  };
 
   const STUDY_HINTS = {
     "Virtualization Introduction": "Re-read the cloud-computing basics (5 features, deployment models), the IaaS/PaaS/SaaS layering, and H3C's CAS/SDN/ONEStor product mapping.",
@@ -35,15 +32,6 @@
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-  const shuffle = (arr) => {
-    const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  };
-
   const fmtTime = (totalSec) => {
     const s = Math.max(0, Math.floor(totalSec));
     const h = Math.floor(s / 3600);
@@ -54,35 +42,6 @@
   };
 
   const letter = (i) => String.fromCharCode(65 + i);
-
-  const setsEqual = (a, b) => {
-    if (a.length !== b.length) return false;
-    const sa = new Set(a);
-    for (const x of b) if (!sa.has(x)) return false;
-    return true;
-  };
-
-  // ---- stratified pick ------------------------------------------------------
-  const stratifiedPick = (bank, attemptSize) => {
-    const sections = Object.keys(WEIGHTS);
-    const targets = {};
-    let assigned = 0;
-    for (const s of sections) {
-      targets[s] = Math.round(WEIGHTS[s] * attemptSize);
-      assigned += targets[s];
-    }
-    if (assigned !== attemptSize) {
-      const diff = attemptSize - assigned;
-      const heaviest = sections.reduce((a, b) => (WEIGHTS[a] >= WEIGHTS[b] ? a : b));
-      targets[heaviest] += diff;
-    }
-    const picks = [];
-    for (const s of sections) {
-      const pool = bank.filter((q) => q.section === s);
-      picks.push(...shuffle(pool).slice(0, targets[s]));
-    }
-    return shuffle(picks);
-  };
 
   // ---- state ----------------------------------------------------------------
   let bank = null;
@@ -443,28 +402,6 @@
     renderReview();
   };
 
-  // ---- scoring --------------------------------------------------------------
-  const scoreQuestion = (q, selectedPositions, correctPositions) => {
-    if (selectedPositions.length === 0) return { score: 0, status: "skipped" };
-    const correctSet = new Set(correctPositions);
-    const selSet = new Set(selectedPositions);
-    const correctPicked = selectedPositions.filter((p) => correctSet.has(p)).length;
-    const wrongPicked = selectedPositions.length - correctPicked;
-    if (correctPositions.length === 1) {
-      // single-pick: must be the exact one
-      const ok = setsEqual(selectedPositions, correctPositions);
-      return { score: ok ? 1 : 0, status: ok ? "correct" : "incorrect" };
-    }
-    // multi-pick: partial credit
-    const raw = (correctPicked - wrongPicked) / correctPositions.length;
-    const score = Math.max(0, Math.min(1, raw));
-    let status;
-    if (score === 1) status = "correct";
-    else if (score === 0) status = "incorrect";
-    else status = "partial";
-    return { score, status };
-  };
-
   // ---- recommendations ------------------------------------------------------
   const buildRecommendations = (perSection) => {
     const sorted = Object.entries(perSection)
@@ -591,7 +528,7 @@
       const order = state.optionOrder[id];
       const selected = state.answers[id] || [];
       const correctPositions = correctPositionsFor(q);
-      const { score, status } = scoreQuestion(q, selected, correctPositions);
+      const { score, status } = scoreQuestion(selected, correctPositions);
       scoreSum += score;
       tally[status]++;
       const sec = q.section;
@@ -923,4 +860,4 @@
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
-})();
+}
