@@ -9,7 +9,7 @@ Vanilla HTML + CSS + JS, served from Cloudflare Workers Static Assets with a tin
 
 ## Status
 
-**Locked at v1.1.0** — feature-complete; merges to `main` should be limited to bank-content updates, CF deploy fixes, security patches, and additional tests. Major behaviour changes warrant a v2 branch.
+**Locked at v1.3.0** — feature-complete; merges to `main` should be limited to bank-content updates, CF deploy fixes, security patches, and additional tests. Major behaviour changes warrant a v2 branch.
 
 Always run `npm run check` before pushing (it runs `tsc --noEmit && validate && test`). All five targeted-regression tests block:
 
@@ -39,7 +39,7 @@ public/                       # everything served by Workers Static Assets
     css/site.css              # CF-style theme with light + dark
     js/site.js                # theme toggle, live counters, anon tracking
     js/exam.js                # exam engine v3 (50Q/60min/60% policy, partial credit)
-    data/bank.json            # 120-Q bank; 50 picked per attempt
+    data/bank.json            # 250-Q bank; 50 picked per attempt
     img/favicon.svg
 src/index.ts                  # Worker — routes /api/* + delegates rest to ASSETS
 wrangler.jsonc                # Workers config (KV binding, vars)
@@ -56,7 +56,7 @@ build/                        # gitignored — pdftotext + intermediate JSON
 
 ## Question bank
 
-`public/assets/data/bank.json` — 120 questions, schema v2:
+`public/assets/data/bank.json` — 250 questions, schema v2:
 
 ```json
 {
@@ -70,7 +70,7 @@ build/                        # gitignored — pdftotext + intermediate JSON
 }
 ```
 
-Bank composition (12/24/18/24/24/18) maps to the 6 study modules. Sampling weight (10/20/15/20/20/15) is applied per attempt — every attempt covers every module.
+Bank composition (25/50/38/50/50/37 across the 6 modules) maps to the syllabus. Sampling weight (10/20/15/20/20/15) is applied per attempt — every attempt covers every module.
 
 ## Worker routes
 
@@ -78,7 +78,8 @@ Bank composition (12/24/18/24/24/18) maps to the 6 study modules. Sampling weigh
 |---|---|---|
 | `GET /api/stats` | public | Returns `{active, unique, total, ts}` — used by the live counters in the header |
 | `POST /api/track` | public | Increments KV counters; called once per page load |
-| `POST /api/email-report` | public | Accepts `{email, report}`; sends a styled HTML email via SMTP2GO |
+| `POST /api/email-verify-init` | public | Accepts `{email, report}`; stores a 6-digit code in KV (10-min TTL) and emails it |
+| `POST /api/email-verify-confirm` | public | Accepts `{email, code}`; on match, generates the PDF and sends the styled summary email + PDF attachment via SMTP2GO |
 | anything else | — | Delegated to `env.ASSETS.fetch(request)` |
 
 ## Required CF dashboard setup (one-time)
@@ -124,7 +125,7 @@ npm run check        # tsc --noEmit, then bank validator, then vitest suite
 npm run typecheck
 npm run validate                 # bank-only schema + dup + balance check
 npm run validate:strict          # same, but warnings fail too
-npm test                         # 48 vitest cases — scoring, sampling, schema, live bank
+npm test                         # 65 vitest cases — scoring, sampling, schema, live bank
 ```
 
 CF Workers Build is configured at the dashboard; the simplest hardening is to set the **Build command** to `npm run check && npx wrangler deploy` so a bad bank or failing test blocks deploy.
